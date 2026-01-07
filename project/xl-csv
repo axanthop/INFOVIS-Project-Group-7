@@ -1,0 +1,17 @@
+import pandas as pd 
+
+def convert_xlsx_to_csv(input_file, output_file, sheet_name=0):
+
+    df=pd.read_excel(input_file, sheet_name=sheet_name)
+
+    df.to_csv(output_file, index=False)
+
+    print(f"converted {input_file} to {output_file}")
+    
+    return df
+
+if __name__ =="__main__":
+
+    convert_xlsx_to_csv(
+        input_file="./assets/data/cleaned.xlsx",
+        output_file="./assets/data/cleaned.csv")
