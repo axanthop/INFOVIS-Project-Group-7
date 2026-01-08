@@ -1,6 +1,35 @@
 import pandas as pd
 import re
 
+COLUMN_RENAME = {"Name of the NBS intervention (short English title)": "intervention_name",
+                 "City": "city",
+                 "Country": "country",
+                 "Begin": "begin_year",
+                 "End": "end_year",
+                 "Present stage of the intervention": "status",
+                 "Spatial scale": "spatial_scale",
+                 "NBS area (m2)": "nbs_area",
+                 "Type of area before implementation of the NBS": "previous_area_type",
+                 "Short description of the intervention": "short_description",
+                 "Type of nature-based solution/Ecological domain": "nbs_type",
+                 "Sustainability challenge(s) addressed": "sustainability_challenges",
+                 "Focus of the project": "project_focus",
+                 "Goals of the intervention": "intervention_goals",
+                 "Implementation activities": "implementation_activities",
+                 "Climate change adaptation: What activities are imp…ed to realize the conservation goals and targets?": "climate_change_adaptation",
+                 "Climate change mitigation: What activities are imp…ed to realize the conservation goals and targets?": "climate_change_mitigation",
+                 "Habitats and biodiversity conservation: What activ…ed to realize the conservation goals and targets?": "habitats_and_biodiversity_conservation",
+                 "Habitats and biodiversity restoration: What activi…ted to realize the restoration goals and targets?": "habitats_and_biodiversity_restoration",
+                 "Governance arrangements": "governance_arrangements",
+                 "Key actors - initiating organization": "key_actors",
+                 "Participatory methods/forms of community involvement used": "participatory_methods",
+                 "Total cost €": "total_cost",
+                 "Source(s) of funding": "sources_of_funding",
+                 "Environmental impacts": "environmental_impacts",
+                 "Economic impacts": "economic_impacts",
+                 "Social and cultural impacts": "social_cultural_impacts",
+                 "Link": "link"}
+
 
 def remove_columns(df, columns_to_exclude):
     cols = [col for col in columns_to_exclude if col in df.columns]
@@ -61,6 +90,14 @@ def clean_column(df, column_name, new_column_name, replacements):
     df = df.drop(columns=[column_name])
 
     return df
+
+
+def rename_columns(df, replacement_map):
+    missing = [i for i in replacement_map if i not in df.columns]
+    if missing:
+        print(f"Columns not found for the remaining: {missing}")
+
+    return df.rename(columns=replacement_map)
 
 
 # ---------- numeric helpers ----------
@@ -221,6 +258,9 @@ def clean_dataset(
         df,
         exclude=["Begin", "End", "NBS area (m2)", "Total cost €"]
     )
+
+    # 5. Rename columns for better use in code
+    df = rename_columns(df, COLUMN_RENAME)
 
     # Save and return
     df.to_excel(output_file, index=False)
