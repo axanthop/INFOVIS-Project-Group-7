@@ -103,3 +103,15 @@ header{
     color: white;
     border-color: #0d6efd;
 }
+
+.nbs-area-slider input[type="range"]{
+    width: 100px;
+    margin: 6ox 0px;
+}
+
+.range-values {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+}

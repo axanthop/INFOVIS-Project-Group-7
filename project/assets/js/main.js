@@ -4,7 +4,13 @@ let filters = {
     cities: new Set(),
     startYear: null,
     endYear: null,
-    nbsArea: [null, null]
+    nbsArea: [null, null],
+    previousArea: new Set(),
+    nbsType: new Set(),
+    totalCost: [null, null],
+    funding: new Set(),
+    envImpacts: new Set(),
+    econImpacts: new Set()
 };
 
 // country
@@ -53,6 +59,63 @@ nbsAreaFilter.addEventListener("click", () => {
     nbsAreaPanel.classList.toggle("open");
 })
 
+// area before intervention
+let previousAreaFilter = document.getElementById("previous-area-filter");
+let previousAreaPanel = document.getElementById("previous-area-panel");
+let previousAreaOptions = document.getElementById("previous-area-options");
+
+previousAreaFilter.addEventListener("click", () => {
+    previousAreaPanel.classList.toggle("open");
+});
+
+// nbs type
+let nbsTypeFilter = document.getElementById("nbs-type-filter");
+let nbsTypePanel = document.getElementById("nbs-type-panel");
+let nbsTypeOptions = document.getElementById("nbs-type-options");
+
+nbsTypeFilter.addEventListener("click", () => {
+    nbsTypePanel.classList.toggle("open");
+});
+
+// total cost
+let totalCostFilter = document.getElementById("cost-filter");
+let totalCostPanel = document.getElementById("cost-panel");
+let totalCostMin = document.getElementById("cost-min");
+let totalCostMax = document.getElementById("cost-max");
+let totalCostMinLabel = document.getElementById("cost-min-label");
+let totalCostMaxLabel = document.getElementById("cost-max-label");
+
+totalCostFilter.addEventListener("click", () => {
+    totalCostPanel.classList.toggle("open");
+})
+
+// sources of funding
+let fundingFilter = document.getElementById("funding-filter");
+let fundingPanel = document.getElementById("funding-panel");
+let fundingOptions = document.getElementById("funding-options");
+
+fundingFilter.addEventListener("click", () => {
+    fundingPanel.classList.toggle("open");
+});
+
+// environmental impacts
+let envImpactsFilter = document.getElementById("env-impact-filter");
+let envImpactsPanel = document.getElementById("env-impact-panel");
+let envImpactsOptions = document.getElementById("env-impact-options");
+
+envImpactsFilter.addEventListener("click", () => {
+    envImpactsPanel.classList.toggle("open");
+});
+
+// economic impacts
+let econImpactsFilter = document.getElementById("econ-impact-filter");
+let econImpactsPanel = document.getElementById("econ-impact-panel");
+let econImpactsOptions = document.getElementById("econ-impact-options");
+
+econImpactsFilter.addEventListener("click", () => {
+    econImpactsPanel.classList.toggle("open");
+});
+
 
 let wholeData = [];
 let filteredData = [];
@@ -65,11 +128,17 @@ d3.csv("./assets/data/cleaned.csv").then(data => {
     renderCityOptions(wholeData);
     renderStartYearOptions(wholeData);
     renderEndYearOptions(wholeData);
+    initializeNbsAreaSlider(wholeData);
+    renderPreviousAreaOptions(wholeData);
+    renderNbsTypeOptions(wholeData);
+    renderFundingOptions(wholeData);
+    renderEnvironmentalImpactsOptions(wholeData);
+    renderEconomicImpactsOptions(wholeData);
+    initializeCostSlider(wholeData);
 
     countryOptions.addEventListener("change", (e) => {
         let checkbox = e.target;
         
-
         if (checkbox.checked) {
             filters.countries.add(checkbox.value);
         } else {
@@ -107,6 +176,81 @@ d3.csv("./assets/data/cleaned.csv").then(data => {
         applyFilters();
     });
 
+    nbsAreaMin.addEventListener("input", updateNbsAreaFilter);
+    nbsAreaMax.addEventListener("input", updateNbsAreaFilter);
+
+    previousAreaOptions.addEventListener("change", (e) => {
+        let checkbox = e.target;
+
+        if (checkbox.checked) {
+            filters.previousArea.add(checkbox.value);
+        } else {
+            filters.previousArea.delete(checkbox.value);
+        }
+
+        previousAreaFilter.classList.toggle("active", filters.previousArea.size > 0);
+
+        applyFilters();
+    });
+
+    nbsTypeOptions.addEventListener("change", (e) => {
+        let checkbox = e.target;
+
+        if (checkbox.checked) {
+            filters.nbsType.add(checkbox.value);
+        } else {
+            filters.nbsType.delete(checkbox.value);
+        }
+
+        nbsTypeFilter.classList.toggle("active", filters.nbsType.size > 0);
+
+        applyFilters();
+    });
+
+    totalCostMin.addEventListener("input", updateCostFilter);
+    totalCostMax.addEventListener("input", updateCostFilter);
+
+    fundingOptions.addEventListener("change", (e) => {
+        let checkbox = e.target;
+
+        if (checkbox.checked) {
+            filters.funding.add(checkbox.value);
+        } else {
+            filters.funding.delete(checkbox.value);
+        }
+
+        fundingFilter.classList.toggle("active", filters.funding.size > 0);
+
+        applyFilters();
+    });
+
+    envImpactsOptions.addEventListener("change", (e) => {
+        let checkbox = e.target;
+
+        if (checkbox.checked) {
+            filters.envImpacts.add(checkbox.value);
+        } else {
+            filters.envImpacts.delete(checkbox.value);
+        }
+
+        envImpactsFilter.classList.toggle("active", filters.envImpacts.size > 0);
+
+        applyFilters();
+    });
+
+    econImpactsOptions.addEventListener("change", (e) => {
+        let checkbox = e.target;
+
+        if (checkbox.checked) {
+            filters.econImpacts.add(checkbox.value);
+        } else {
+            filters.econImpacts.delete(checkbox.value);
+        }
+
+        econImpactsFilter.classList.toggle("active", filters.econImpacts.size > 0);
+
+        applyFilters();
+    });
 
 });
 
@@ -114,28 +258,93 @@ d3.csv("./assets/data/cleaned.csv").then(data => {
 function applyFilters() {
     let filteredData = wholeData;
     
+    // county
     if (filters.countries.size > 0) {
         filteredData = filteredData.filter(d => 
             filters.countries.has(d.country)
         );
     }
 
+    // city
     if (filters.cities.size > 0) {
         filteredData = filteredData.filter(d => 
             filters.cities.has(d.city)
         );
     }
 
+    // start year
     if (filters.startYear !== null) {
         filteredData = filteredData.filter(d => 
             +d.begin_year >= filters.startYear
         );
     }
 
+    // end year
     if (filters.endYear !== null) {
         filteredData = filteredData.filter(d => 
             +d.end_year <= filters.endYear
         );
+    }
+
+    // nbs area
+    if (filters.nbsArea && filters.nbsArea[0] !== null) {
+        filteredData = filteredData.filter(d => {
+            let nbsArea = +d.nbs_area;
+            return nbsArea >= filters.nbsArea[0] && nbsArea <= filters.nbsArea[1];
+        });
+    }
+
+    // area before intervention
+    if (filters.previousArea.size > 0) {
+        filteredData = filteredData.filter(d => 
+            filters.previousArea.has(d.previous_area_type)
+        );
+    }
+
+    // nbs type
+    if (filters.nbsType.size > 0) {
+        filteredData = filteredData.filter(d => {
+            if (!d.nbs_type || d.nbs_type === "Unknown") return;
+
+            let projTypes = d.nbs_type.split(";").map(t => t.trim());
+            return projTypes.some(t => filters.nbsType.has(t));
+        });
+    }
+
+    // total cost
+    if (filters.totalCost && filters.totalCost[0] !== null) {
+        filteredData = filteredData.filter(d => {
+            let totalCost = +d.total_cost;
+            if (isNaN(totalCost)) return false;
+            return totalCost >= filters.totalCost[0] && totalCost <= filters.totalCost[1];
+        });
+    }
+
+    // sources of funding
+    if (filters.funding.size > 0) {
+        filteredData = filteredData.filter(d => 
+            d.sources_of_funding && d.sources_of_funding !== "Unknown" && filters.funding.has(d.sources_of_funding)
+        );
+    }
+
+    // environmental impacts
+    if (filters.envImpacts.size > 0) {
+        filteredData = filteredData.filter(d => {
+            if (!d.environmental_impacts || d.environmental_impacts === "Unknown") return;
+
+            let projTypes = d.environmental_impacts.split(";").map(t => t.trim());
+            return projTypes.some(t => filters.envImpacts.has(t));
+        });
+    }
+
+    // economic impacts
+    if (filters.econImpacts.size > 0) {
+        filteredData = filteredData.filter(d => {
+            if (!d.economic_impacts || d.economic_impacts === "Unknown") return;
+
+            let projTypes = d.economic_impacts.split(";").map(t => t.trim());
+            return projTypes.some(t => filters.econImpacts.has(t));
+        });
     }
 
     console.log("Filtered Projects: ", filteredData);
@@ -236,5 +445,169 @@ function renderEndYearOptions(data) {
             applyFilters();
         });
         endContainer.appendChild(div);
+    });
+}
+
+function initializeNbsAreaSlider(data) {
+    let nbsAreas = data.map(d => +d.nbs_area).filter(v => !isNaN(v));
+
+    let min = Math.min(...nbsAreas);
+    let max = Math.max(...nbsAreas);
+
+    nbsAreaMin.min = min;
+    nbsAreaMin.max = max;
+    nbsAreaMax.min = min;
+    nbsAreaMax.max = max;
+    nbsAreaMin.value = min;
+    nbsAreaMax.value = max;
+
+    nbsAreaMinLabel.textContent = `Min: ${min}`;
+    nbsAreaMaxLabel.textContent = `Max: ${max}`;
+
+    filters.nbsArea = [min, max];
+}
+
+function updateNbsAreaFilter() {
+    let min = +nbsAreaMin.value;
+    let max = +nbsAreaMax.value;
+
+    if (min > max) {
+        [min, max] = [max, min];
+        nbsAreaMin.value = min;
+        nbsAreaMax.value = max;
+    }
+
+    filters.nbsArea = [min, max];
+    nbsAreaMinLabel.textContent = `Min: ${min}`;
+    nbsAreaMaxLabel.textContent = `Max: ${max}`;
+
+    nbsAreaFilter.classList.add("active");
+
+    applyFilters();
+}
+
+function renderPreviousAreaOptions(data) {
+    previousAreaOptions.innerHTML = "";
+    let previousAreas = [...new Set(data.map(d => d.previous_area_type))]
+                                        .filter(d => d && d !== "Unknown").sort();
+
+    previousAreas.forEach(previousArea => {
+        let label = document.createElement("label");
+        label.innerHTML = `<input type="checkbox" value="${previousArea}">
+                            ${previousArea}`;
+
+        previousAreaOptions.appendChild(label);
+    });
+}
+
+function renderNbsTypeOptions(data) {
+    nbsTypeOptions.innerHTML = "";
+    let nbsTypes = new Set();
+
+    data.forEach(d => {
+        if (!d.nbs_type || d.nbs_type === "Unknown") return;
+
+        d.nbs_type.split(";").map(t => t.trim()).forEach(t => nbsTypes.add(t));
+    });
+
+    [...nbsTypes].sort().forEach(nbsType => {
+        let label = document.createElement("label");
+        label.innerHTML = `<input type="checkbox" value="${nbsType}">
+                            ${nbsType}`;
+
+        nbsTypeOptions.appendChild(label);
+    });
+}
+
+function initializeCostSlider(data) {
+    let totalCosts = data.map(d => +d.total_cost).filter(v => !isNaN(v));
+
+    let min = Math.min(...totalCosts);
+    let max = Math.max(...totalCosts);
+
+    totalCostMin.min = min;
+    totalCostMin.max = max;
+    totalCostMax.min = min;
+    totalCostMax.max = max;
+    totalCostMin.value = min;
+    totalCostMax.value = max;
+
+    totalCostMinLabel.textContent = `Min: ${min}`;
+    totalCostMaxLabel.textContent = `Max: ${max}`;
+
+    filters.totalCost = [min, max];
+}
+
+function updateCostFilter() {
+    let min = +totalCostMin.value;
+    let max = +totalCostMax.value;
+
+    if (min > max) {
+        [min, max] = [max, min];
+        totalCostMin.value = min;
+        totalCostMax.value = max;
+    }
+
+    filters.totalCost = [min, max];
+    totalCostMinLabel.textContent = `Min: ${min}`;
+    totalCostMaxLabel.textContent = `Max: ${max}`;
+
+    totalCostFilter.classList.add("active");
+
+    applyFilters();
+}
+
+function renderFundingOptions(data) {
+    fundingOptions.innerHTML = "";
+
+    let fundings = [...new Set(data.map(d => d.sources_of_funding))]
+                                .filter(d => d && d !== "Unknown")
+                                .sort();
+    
+    fundings.forEach(funding => {
+        let label = document.createElement("label");
+        label.innerHTML = `<input type="checkbox" value="${funding}">
+                            ${funding}`;
+
+        fundingOptions.appendChild(label);
+    });
+
+}
+
+function renderEnvironmentalImpactsOptions(data) {
+    envImpactsOptions.innerHTML = "";
+    let envImpacts = new Set();
+
+    data.forEach(d => {
+        if (!d.environmental_impacts || d.environmental_impacts === "Unknown") return;
+
+        d.environmental_impacts.split(";").map(t => t.trim()).forEach(t => envImpacts.add(t));
+    });
+
+    [...envImpacts].sort().forEach(envImpact => {
+        let label = document.createElement("label");
+        label.innerHTML = `<input type="checkbox" value="${envImpact}">
+                            ${envImpact}`;
+
+        envImpactsOptions.appendChild(label);
+    });
+}
+
+function renderEconomicImpactsOptions(data) {
+    econImpactsOptions.innerHTML = "";
+    let econImpacts = new Set();
+
+    data.forEach(d => {
+        if (!d.economic_impacts || d.economic_impacts === "Unknown") return;
+
+        d.economic_impacts.split(";").map(t => t.trim()).forEach(t => econImpacts.add(t));
+    });
+
+    [...econImpacts].sort().forEach(econImpact => {
+        let label = document.createElement("label");
+        label.innerHTML = `<input type="checkbox" value="${econImpact}">
+                            ${econImpact}`;
+
+        econImpactsOptions.appendChild(label);
     });
 }
