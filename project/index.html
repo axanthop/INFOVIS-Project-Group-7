@@ -22,22 +22,69 @@
 			<a href="./database.html">Database</a>
 		</nav>
 	</header>
-	<main>
-		<aside>
-			<h2>Filters</h2>
-				<div id="filter-nbs"></div>
-				<div id="filter-area"></div>
-				<div id="filter-cost"></div>
-				<div id="filter-country"></div>
-				<div id="filter-city"></div>
-				<div id="filter-scale"></div>
-				<div id="filter-begin"></div>
-				<div id="filter-end"></div>
-		</aside>
-		<section class="map-section">
-			<svg id="map"></svg>
-		</section>
-	</main>
+
+	<div id="filters">
+
+		<!-- country -->
+		 <div class="filter-group">
+			<button class="filter-button" id="country-filter">
+				Country
+			</button>
+			<div class="filter-panel" id="country-panel">
+				<div class="filter-options" id="country-options">
+
+				</div>
+			</div>
+		 </div>
+		 <!-- city -->
+		  <div class="filter-group">
+			<button class="filter-button" id="city-filter">
+				City
+			</button>
+			<div class="filter-panel" id="city-panel">
+				<div class="filter-options" id="city-options">
+
+				</div>
+			</div>
+		 </div>
+		 <!-- start year -->
+		  <div class="filter-group">
+			<button class="filter-button" id="start-year-filter">
+				Start Year
+			</button>
+			<div class="filter-panel" id="start-year-panel">
+				<div class="year-grid" id="start-year-options"></div>
+			</div>
+		  </div>
+		  <!-- end year -->
+		  <div class="filter-group">
+			<button class="filter-button" id="end-year-filter">
+				End Year
+			</button>
+			<div class="filter-panel" id="end-year-panel">
+				<div class="year-grid" id="end-year-options"></div>
+			</div>
+		  </div>
+		  <!-- nbs area -->
+		   <div class="filter-group">
+			<button class="filter-button" id="nbs-area-filter">
+				NbS Area (m2)
+			</button>
+			<div class="filter-panel" id="nbs-area-panel">
+				<div class="filter-options nbs-area-slider">
+					<div class="range-values">
+						<span id="nbs-area-min-label"></span>
+						<span id="nbs-area-max-label"></span>
+					</div>
+					<input type="range" id="nbs-area-min" step="1">
+					<input type="range" id="nbs-area-max" step="1">
+				</div>
+			</div>
+		  </div>
+		
+	</div>
+
+
 	<!-- embedding JS libraries -->
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
 

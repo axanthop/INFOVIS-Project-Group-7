@@ -1,81 +1,240 @@
-const appState={
-    data:[],
-    filteredData:[],
-    filters:{
-        nbsType:[],
-        area:[0,Infinity],
-        cost:[0,Infinity]
-    }
+
+let filters = {
+    countries: new Set(),
+    cities: new Set(),
+    startYear: null,
+    endYear: null,
+    nbsArea: [null, null]
 };
 
-let svg, projection, tooltip;
+// country
+let countryFilter = document.getElementById("country-filter");
+let countryPanel = document.getElementById("country-panel");
+let countryOptions = document.getElementById("country-options");
 
-function updateVisuals(){
-    updateMap(appState.filteredData);
+countryFilter.addEventListener("click", () => {
+    countryPanel.classList.toggle("open");
+});
+
+// city
+let cityFilter = document.getElementById("city-filter");
+let cityPanel = document.getElementById("city-panel");
+let cityOptions = document.getElementById("city-options");
+
+cityFilter.addEventListener("click", () => {
+    cityPanel.classList.toggle("open");
+});
+
+// start year
+let startYearFilter = document.getElementById("start-year-filter");
+let startYearPanel = document.getElementById("start-year-panel");
+
+startYearFilter.addEventListener("click", () => {
+    startYearPanel.classList.toggle("open");
+});
+
+// end year
+let endYearFilter = document.getElementById("end-year-filter");
+let endYearPanel = document.getElementById("end-year-panel");
+
+endYearFilter.addEventListener("click", () => {
+    endYearPanel.classList.toggle("open");
+});
+
+// nbs area
+let nbsAreaFilter = document.getElementById("nbs-area-filter");
+let nbsAreaPanel = document.getElementById("nbs-area-panel");
+let nbsAreaMin = document.getElementById("nbs-area-min");
+let nbsAreaMax = document.getElementById("nbs-area-max");
+let nbsAreaMinLabel = document.getElementById("nbs-area-min-label");
+let nbsAreaMaxLabel = document.getElementById("nbs-area-max-label");
+
+nbsAreaFilter.addEventListener("click", () => {
+    nbsAreaPanel.classList.toggle("open");
+})
+
+
+let wholeData = [];
+let filteredData = [];
+
+d3.csv("./assets/data/cleaned.csv").then(data => {
+    
+    wholeData = data;
+    
+    renderCountryOptions(wholeData);
+    renderCityOptions(wholeData);
+    renderStartYearOptions(wholeData);
+    renderEndYearOptions(wholeData);
+
+    countryOptions.addEventListener("change", (e) => {
+        let checkbox = e.target;
+        
+
+        if (checkbox.checked) {
+            filters.countries.add(checkbox.value);
+        } else {
+            filters.countries.delete(checkbox.value);
+        }
+
+        countryFilter.classList.toggle("active", filters.countries.size > 0);
+
+        let filteredCountry = wholeData;
+        if (filters.countries.size > 0) {
+            filteredCountry = wholeData.filter(d => 
+                filters.countries.has(d.country)
+            );
+        }
+
+        filters.cities.clear();
+        cityFilter.classList.remove("active");
+
+        renderCityOptions(filteredCountry);
+
+        applyFilters();
+    });
+
+    cityOptions.addEventListener("change", (e) => {
+        let checkbox = e.target;
+
+        if (checkbox.checked) {
+            filters.cities.add(checkbox.value);
+        } else {
+            filters.cities.delete(checkbox.value);
+        }
+
+        cityFilter.classList.toggle("active", filters.cities.size > 0);
+
+        applyFilters();
+    });
+
+
+});
+
+
+function applyFilters() {
+    let filteredData = wholeData;
+    
+    if (filters.countries.size > 0) {
+        filteredData = filteredData.filter(d => 
+            filters.countries.has(d.country)
+        );
+    }
+
+    if (filters.cities.size > 0) {
+        filteredData = filteredData.filter(d => 
+            filters.cities.has(d.city)
+        );
+    }
+
+    if (filters.startYear !== null) {
+        filteredData = filteredData.filter(d => 
+            +d.begin_year >= filters.startYear
+        );
+    }
+
+    if (filters.endYear !== null) {
+        filteredData = filteredData.filter(d => 
+            +d.end_year <= filters.endYear
+        );
+    }
+
+    console.log("Filtered Projects: ", filteredData);
+    // updateResults(filteredData);
 }
-d3.csv("./assets/data/cleaned.csv").then(data =>
-{
-    appState.data = data;
-    appState.filteredData = data;
 
-    initFilters(data);
-    initMap(data);
-}
-)
-function initFilters(data){
-    d3.select("#filter-nbs")
-        .append("p")
-        .text("NBS type: ");
-    d3.select("#filter-country")
-        .append("p")
-        .text("Country: ");
-    d3.select("#filter-city")
-        .append("p")
-        .text("City: ");
-    d3.select("#filter-area")
-        .append("p")
-        .text("Area: ");
-    d3.select("#filter-cost")
-        .append("p")
-        .text("Cost: ");
-    d3.select("#filter-scale")
-        .append("p")
-        .text("Spatial Scale: ");
+function renderCountryOptions(data) {
+    let countries = [...new Set(data.map(d => d.country))].sort();
 
+    countries.forEach(country => {
+        let label = document.createElement("label");
+        label.innerHTML = `<input type="checkbox" value="${country}">
+                            ${country}`;
+
+        countryOptions.appendChild(label);
+    });
 }
 
-function initMap(data){
-    svg = d3.select("#map");
-    const width = svg.node().clientWidth;
-    const height = svg.node().clientHeight;
+function renderCityOptions(data) {
+    cityOptions.innerHTML = "";
 
-    svg.attr("viewBox",[0,0, width, height]);
+    let cities = [...new Set(data.map(d => d.city))]
+                                .filter(d => d && d !== "Unknown")
+                                .sort();
+    
+    cities.forEach(city => {
+        let label = document.createElement("label");
+        label.innerHTML = `<input type="checkbox" value="${city}">
+                            ${city}`;
 
-    projection = d3.geoMercator()
-        .center([10,50])
-        .scale(400)
-        .translate([width/2, height/2]);
-    tooltip=d3.select("body")
-        .append("div")
-        .style("position", "absolute")
-        .style("background", "white")
-        .style("border", "1px solid black")
-        .style("padding", "10px")
-        .style("display", "none");
-    updateMap(data);
+        cityOptions.appendChild(label);
+    });
+
 }
 
-//     svg.append("text")
-//         .attr("x", width/2)
-//         .attr("y", height/2)
-//         .attr("text-anchor", "middle")
-//         .text("Map render");
-// }
-function updateMap(data){
-     const circles = svg.selectAll("circle")
-         .data(data);
+function renderStartYearOptions(data) {
+    let stContainer = document.getElementById("start-year-options");
+    stContainer.innerHTML = "";
 
-    circles.enter()
-        .append("circle")
-        .attr("cx", d=>projection([]))
+    let years = [...new Set(data.map(d => +d.begin_year))]
+                                .filter(y => !isNaN(y))
+                                .sort((a,b) => a - b);
+
+    years.forEach(year => {
+        let div = document.createElement("div");
+        div.className = "year-option";
+        div.textContent = year;
+
+        div.addEventListener("click", () => {
+
+            if (filters.startYear === year) {
+                filters.startYear = null;
+                div.classList.remove("selected");
+                startYearFilter.classList.remove("active");
+            } else {
+                filters.startYear = year;
+
+                document.querySelectorAll(".year-option").forEach(element => element.classList.remove("selected"));
+                div.classList.add("selected");
+
+                document.getElementById("start-year-filter").classList.add("active");
+            }
+
+            applyFilters();
+        });
+        stContainer.appendChild(div);
+    });
+}
+
+function renderEndYearOptions(data) {
+    let endContainer = document.getElementById("end-year-options");
+    endContainer.innerHTML = "";
+
+    let years = [...new Set(data.map(d => +d.end_year))]
+                                .filter(y => !isNaN(y))
+                                .sort((a,b) => a - b);
+
+    years.forEach(year => {
+        let div = document.createElement("div");
+        div.className = "year-option";
+        div.textContent = year;
+
+        div.addEventListener("click", () => {
+
+            if (filters.endYear === year) {
+                filters.endYear = null;
+                div.classList.remove("selected");
+                endYearFilter.classList.remove("active");
+            } else {
+                filters.endYear = year;
+
+                document.querySelectorAll(".end-year-options .year-option").forEach(element => element.classList.remove("selected"));
+                div.classList.add("selected");
+
+                endYearFilter.classList.add("active");
+            }
+
+            applyFilters();
+        });
+        endContainer.appendChild(div);
+    });
 }
