@@ -27,3 +27,79 @@ header{
     background-color: darkblue;
     border-radius: 5px;
 }
+
+.filter-group {
+    margin-bottom: 12px;
+}
+
+.filter-button {
+    width: 100%;
+    text-align: left;
+    padding: 10px;
+    background: #f4f4f4;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.filter-button.active {
+    color: #1f77b4;
+    border-color: #0d6efd;
+}
+
+.filter-panel {
+    max-height: 0px;
+    /* overflow: hidden; */
+    overflow-y: auto;
+    transition: max-height 0.3s ease;
+    border-left: 2px solid #ddd;
+}
+
+.filter-panel.open {
+    max-height: 200px;
+}
+
+.filter-options {
+    padding: 8px 10px;
+    max-height: 180px;
+    overflow-y: auto;
+}
+
+.filter-options label {
+    display: block;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* .filter-panel {
+    display: none;
+    padding: 8px;
+    border: 1px solid #ccc;
+    margin-top: 4px;
+    background: #fff;
+} */
+
+.year-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+}
+
+.year-option {
+    padding: 6px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.year-option:hover {
+    background-color: #f0f4ff;
+}
+
+.year-option.selected {
+    background-color: #0d6efd;
+    color: white;
+    border-color: #0d6efd;
+}
