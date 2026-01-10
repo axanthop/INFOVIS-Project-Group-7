@@ -156,11 +156,32 @@ header{
     /* margin-bottom: 10px; */
     background: #fff;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    position: relative;
 }
 
 .project-card h4 {
     margin: 0 0 6px;
     font-size: 16px;
+}
+
+.project-hover-panel {
+    position: absolute;
+    top: 0;
+    left: 100%;
+    margin-left: 10px;
+    width: 260px;
+    background: rgb(227, 227, 227);
+    border: 1px solid #ddd;
+    padding: 10px;
+    font-size: 13px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    z-index: 10;
+    display: none;
+}
+
+.project-card:hover .project-hover-panel {
+    display: block;
 }
 
 .project-meta {
@@ -192,6 +213,7 @@ header{
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 16px;
     margin-top: 12px;
+    overflow: visible;
 }
 
 .search-bar {

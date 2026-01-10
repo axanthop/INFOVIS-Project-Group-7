@@ -832,14 +832,62 @@ function renderResults(data) {
                 <strong>City:</strong> ${d.city || "-"} <br>
                 <strong>Start:</strong> ${d.begin_year || "-"} -
                 <strong>End:</strong> ${d.end_year || "-"} <br>
-                <strong>NbS Area:</strong> ${d.nbs_area || "-"} m2 |
-                <strong>Total Cost:</strong> ${d.total_cost || "-"} € <br>
+                <strong>NbS Area:</strong> ${d.nbs_area || "-"}m2 |
+                <strong>Total Cost:</strong> ${d.total_cost || "-"}€ <br>
                 <label class="compare-option">
                     <input type="checkbox" data-id="${projectId}">
                     Compare
                 </label>
             </div>
             `;
+
+        projectCard.innerHTML += `
+            <div class="project-hover-panel">
+                <p><strong>Country:</strong> ${d.country}</p>
+                <p><strong>City:</strong> ${d.city}</p>
+                <p><strong>Start Year:</strong> ${d.begin_year}</p>
+                <p><strong>End Year:</strong> ${d.end_year}</p>
+                <p><strong>NbS Area:</strong> ${d.nbs_area}</p>
+                <p><strong>Area before Implementation:</strong> ${d.previous_area_type}</p>
+                <p><strong>NbS Type:</strong> ${d.nbs_type}m2</p>
+                <p><strong>Total Cost:</strong> ${d.total_cost}€</p>
+                <p><strong>Sources of Funding:</strong> ${d.sources_of_funding}</p>
+                <p><strong>Environmental Impacts:</strong> ${d.environmental_impacts}</p>
+                <p><strong>Economic Impacts:</strong> ${d.economic_impacts}</p>
+            </div>
+            `;
+
+        let hoverProjectPanel = projectCard.querySelector(".project-hover-panel");
+        let hoverTimeout = null;
+
+        projectCard.addEventListener("mouseenter", () => {
+            hoverTimeout = setTimeout(() => {
+                hoverProjectPanel.style.display = "block";
+                // to ensure that the hover is displayed in the page and not outside for every project card
+                hoverProjectPanel.style.left = "100%";
+                hoverProjectPanel.style.right = "auto";
+                hoverProjectPanel.style.marginLeft = "10px";
+                hoverProjectPanel.style.marginRight = "0";
+
+                // we getting the position of the card so to know where to open the hover panel
+                requestAnimationFrame(() => {
+                    let panelRect = hoverProjectPanel.getBoundingClientRect();
+                    let viewWidth = window.innerWidth;
+
+                    if (panelRect.right > viewWidth) {
+                        hoverProjectPanel.style.left = "auto";
+                        hoverProjectPanel.style.right = "100%";
+                        hoverProjectPanel.style.marginLeft = "0";
+                        hoverProjectPanel.style.marginRight = "10px";
+                    }
+                });
+            }, 1500);
+        });
+
+        projectCard.addEventListener("mouseleave", () => {
+            clearTimeout(hoverTimeout);
+            hoverProjectPanel.style.display = "none";
+        })
 
         let compareCheckbox = projectCard.querySelector('input[type="checkbox"]');
         compareCheckbox.checked = comparingSet.has(projectId);
