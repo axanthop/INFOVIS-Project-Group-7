@@ -124,6 +124,9 @@ d3.csv("./assets/data/cleaned.csv").then(data => {
     
     wholeData = data;
     
+    // to show every project when open the page
+    renderResults(wholeData);
+    
     renderCountryOptions(wholeData);
     renderCityOptions(wholeData);
     renderStartYearOptions(wholeData);
@@ -347,8 +350,11 @@ function applyFilters() {
         });
     }
 
-    console.log("Filtered Projects: ", filteredData);
-    // updateResults(filteredData);
+    // active filters
+    renderActiveFilters();
+
+    // console.log("Filtered Projects: ", filteredData);
+    renderResults(filteredData);
 }
 
 function renderCountryOptions(data) {
@@ -448,6 +454,7 @@ function renderEndYearOptions(data) {
     });
 }
 
+let nbsAreaDefaults = [null, null];
 function initializeNbsAreaSlider(data) {
     let nbsAreas = data.map(d => +d.nbs_area).filter(v => !isNaN(v));
 
@@ -464,6 +471,7 @@ function initializeNbsAreaSlider(data) {
     nbsAreaMinLabel.textContent = `Min: ${min}`;
     nbsAreaMaxLabel.textContent = `Max: ${max}`;
 
+    nbsAreaDefaults = [min, max];
     filters.nbsArea = [min, max];
 }
 
@@ -519,6 +527,7 @@ function renderNbsTypeOptions(data) {
     });
 }
 
+let totalCostDefaults = [null, null]
 function initializeCostSlider(data) {
     let totalCosts = data.map(d => +d.total_cost).filter(v => !isNaN(v));
 
@@ -532,9 +541,10 @@ function initializeCostSlider(data) {
     totalCostMin.value = min;
     totalCostMax.value = max;
 
-    totalCostMinLabel.textContent = `Min: ${min}`;
-    totalCostMaxLabel.textContent = `Max: ${max}`;
+    totalCostMinLabel.textContent = `Min: ${min}€`;
+    totalCostMaxLabel.textContent = `Max: ${max}€`;
 
+    totalCostDefaults = [min, max];
     filters.totalCost = [min, max];
 }
 
@@ -609,5 +619,172 @@ function renderEconomicImpactsOptions(data) {
                             ${econImpact}`;
 
         econImpactsOptions.appendChild(label);
+    });
+}
+
+function renderActiveFilters() {
+    let activeContainer = document.getElementById("active-filters");
+    activeContainer.innerHTML = "";
+
+    // countries
+    filters.countries.forEach(country => {
+        addActiveTag("Country", country, () => {
+            filters.countries.delete(country);
+            document.querySelectorAll(`#country-options input[value="${country}"]`).forEach(cb => cb.checked = false);
+            countryFilter.classList.toggle("active", filters.countries.size > 0);
+            applyFilters();
+        });
+     });
+
+    //  cities
+    filters.cities.forEach(city => {
+        addActiveTag("City", city, () => {
+            filters.cities.delete(city);
+            document.querySelectorAll(`#city-options input[value="${city}"]`).forEach(cb => cb.checked = false);
+            cityFilter.classList.toggle("active", filters.cities.size > 0);
+            applyFilters();
+        });
+     });
+
+    //  start year
+    if (filters.startYear !== null) {
+        addActiveTag("Start Year", filters.startYear, () => {
+            filters.startYear = null;
+            document.querySelectorAll("#start-year-options .year-option").forEach(d => d.classList.remove("selected"));
+            startYearFilter.classList.remove("active");
+            applyFilters();
+        });
+     }
+
+    //  end year
+    if (filters.endYear !== null) {
+        addActiveTag("End Year", filters.endYear, () => {
+            filters.endYear = null;
+            document.querySelectorAll("#end-year-options .year-option").forEach(d => d.classList.remove("selected"));
+            endYearFilter.classList.remove("active");
+            applyFilters();
+        });
+     }
+
+    //  nbs area
+    if (filters.nbsArea[0] !== nbsAreaDefaults[0] || filters.nbsArea[1] !== nbsAreaDefaults[1]) {
+        addActiveTag("NbS Area m2", `${filters.nbsArea[0]} - ${filters.nbsArea[1]}`, () => {
+            filters.nbsArea = [nbsAreaMin.min, nbsAreaMax.max];
+            nbsAreaMin.value = nbsAreaMin.min;
+            nbsAreaMax.value = nbsAreaMax.max;
+            nbsAreaMinLabel.textContent = `Min: ${nbsAreaMin.min}`;
+            nbsAreaMaxLabel.textContent = `Max: ${nbsAreaMax.max}`;
+
+
+            nbsAreaFilter.classList.remove("active");
+            nbsAreaPanel.classList.remove("open");
+            applyFilters();
+        });
+    }
+
+    // area before implementation
+    filters.previousArea.forEach(area => {
+        addActiveTag("Area before Implementation", area, () => {
+            filters.previousArea.delete(area);
+            document.querySelectorAll(`#previous-area-options input[value="${area}"]`).forEach(cb => cb.checked = false);
+            previousAreaFilter.classList.toggle("active", filters.previousArea.size > 0);
+            applyFilters();
+        });
+     });
+
+     //  nbs type
+    filters.nbsType.forEach(type => {
+        addActiveTag("NbS Type", type, () => {
+            filters.nbsType.delete(type);
+            document.querySelector(`#nbs-type-options input[value="${type}"]`).forEach(cb => cb.checked = false);
+            nbsTypeFilter.classList.toggle("active", filters.nbsType.size > 0);
+            applyFilters();
+        });
+     });
+
+    //  total cost
+    if (filters.totalCost[0] !== totalCostDefaults[0] || filters.totalCost[1] !== totalCostDefaults[1]) {
+        addActiveTag("Total Cost", `${filters.totalCost[0]} - ${filters.totalCost[1]}`, () => {
+            initializeCostSlider(wholeData);
+            totalCostFilter.classList.remove("active");
+            applyFilters();
+        });
+    }
+
+    // sources of funding
+    filters.funding.forEach(funding => {
+        addActiveTag("Sources of Funding", funding, () => {
+            filters.funding.delete(funding);
+            document.querySelector(`#funding-options input[value="${funding}"]`).forEach(cb => cb.checked = false);
+            fundingFilter.classList.toggle("active", filters.funding.size > 0);
+            applyFilters();
+        });
+     });
+
+    // environmental impacts
+    filters.envImpacts.forEach(envImpact => {
+        addActiveTag("Environmental Impacts", envImpact, () => {
+            filters.envImpacts.delete(envImpact);
+            document.querySelectorAll(`#env-impact-options input[value="${envImpact}"]`).forEach(cb => cb.checked = false);
+            envImpactsFilter.classList.toggle("active", filters.envImpacts.size > 0);
+            applyFilters();
+        });
+     });
+
+     // economic impacts
+    filters.econImpacts.forEach(econImpact => {
+        addActiveTag("Economic Impacts", econImpact, () => {
+            filters.econImpacts.delete(econImpact);
+            document.querySelectorAll(`#econ-impact-options input[value="${econImpact}"]`).forEach(cb => cb.checked = false);
+            econImpactsFilter.classList.toggle("active", filters.econImpacts.size > 0);
+            applyFilters();
+        });
+     });
+    
+}
+
+function addActiveTag(label, value, onRemove) {
+    let actContainer = document.getElementById("active-filters");
+
+    let activeTag = document.createElement("div");
+    activeTag.className = "filter-tag";
+    activeTag.innerHTML = `
+    <span><strong>${label}:</strong> ${value}</span>
+    <button>x</button>`;
+
+    activeTag.querySelector("button").addEventListener("click", onRemove);
+    actContainer.appendChild(activeTag);
+}
+
+function renderResults(data) {
+    let resultsList = document.getElementById("results-list");
+    let resultsCount = document.getElementById("results-count");
+
+    resultsList.innerHTML = "";
+    resultsCount.textContent = `${data.length} Project(s)`;
+
+    if (data.length === 0) {
+        resultsList.innerHTML = "<p> No project found for the selected filters.</p>";
+        return;
+    }
+
+    data.forEach(d => {
+        let projectCard = document.createElement("div");
+        projectCard.className = "project-card";
+
+        projectCard.innerHTML = `
+            <h4>${d.intervention_name || "Unnamed project"}</h4>
+            <div class="project-meta">
+                <strong>Country:</strong> ${d.country || "-"} |
+                <strong>City:</strong> ${d.city || "-"} <br>
+                <strong>Start:</strong> ${d.begin_year || "-"} |
+                <strong>End:</strong> ${d.end_year || "-"} <br>
+                <strong>NbS Area:</strong> ${d.nbs_area || "-"} m2 |
+                <strong>Total Cost:</strong> ${d.total_cost || "-"} €
+            </div>
+            `;
+
+        resultsList.appendChild(projectCard);
+
     });
 }

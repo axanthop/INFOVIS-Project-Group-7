@@ -23,118 +23,136 @@
 		</nav>
 	</header>
 
-	<div id="filters">
+	<div class="page-layout">
 
-		<!-- country -->
-		 <div class="filter-group">
-			<button class="filter-button" id="country-filter">
-				Country
-			</button>
-			<div class="filter-panel" id="country-panel">
-				<div class="filter-options" id="country-options"></div>
-			</div>
-		 </div>
-		 <!-- city -->
-		  <div class="filter-group">
-			<button class="filter-button" id="city-filter">
-				City
-			</button>
-			<div class="filter-panel" id="city-panel">
-				<div class="filter-options" id="city-options"></div>
-			</div>
-		 </div>
-		 <!-- start year -->
-		  <div class="filter-group">
-			<button class="filter-button" id="start-year-filter">
-				Start Year
-			</button>
-			<div class="filter-panel" id="start-year-panel">
-				<div class="year-grid" id="start-year-options"></div>
-			</div>
-		  </div>
-		  <!-- end year -->
-		  <div class="filter-group">
-			<button class="filter-button" id="end-year-filter">
-				End Year
-			</button>
-			<div class="filter-panel" id="end-year-panel">
-				<div class="year-grid" id="end-year-options"></div>
-			</div>
-		  </div>
-		  <!-- nbs area -->
-		   <div class="filter-group">
-			<button class="filter-button" id="nbs-area-filter">
-				NbS Area (m2)
-			</button>
-			<div class="filter-panel" id="nbs-area-panel">
-				<div class="filter-options nbs-area-slider">
-					<div class="range-values">
-						<span id="nbs-area-min-label"></span>
-						<span id="nbs-area-max-label"></span>
+		<aside class="filters-column">
+			<!-- filters -->
+			<div id="filters">
+
+				<!-- active filters -->
+				<div class="active-filters" id="active-filters"></div>
+				<!-- country -->
+				<div class="filter-group">
+					<button class="filter-button" id="country-filter">
+						Country
+					</button>
+					<div class="filter-panel" id="country-panel">
+						<div class="filter-options" id="country-options"></div>
 					</div>
-					<input type="range" id="nbs-area-min" step="1">
-					<input type="range" id="nbs-area-max" step="1">
 				</div>
+				<!-- city -->
+				<div class="filter-group">
+					<button class="filter-button" id="city-filter">
+						City
+					</button>
+					<div class="filter-panel" id="city-panel">
+						<div class="filter-options" id="city-options"></div>
+					</div>
+				</div>
+				<!-- start year -->
+				<div class="filter-group">
+					<button class="filter-button" id="start-year-filter">
+						Start Year
+					</button>
+					<div class="filter-panel" id="start-year-panel">
+						<div class="year-grid" id="start-year-options"></div>
+					</div>
+				</div>
+				<!-- end year -->
+				<div class="filter-group">
+					<button class="filter-button" id="end-year-filter">
+						End Year
+					</button>
+					<div class="filter-panel" id="end-year-panel">
+						<div class="year-grid" id="end-year-options"></div>
+					</div>
+				</div>
+				<!-- nbs area -->
+				<div class="filter-group">
+					<button class="filter-button" id="nbs-area-filter">
+						NbS Area (m2)
+					</button>
+					<div class="filter-panel" id="nbs-area-panel">
+						<div class="filter-options nbs-area-slider">
+							<div class="range-values">
+								<span id="nbs-area-min-label"></span>
+								<span id="nbs-area-max-label"></span>
+							</div>
+							<input type="range" id="nbs-area-min" step="1">
+							<input type="range" id="nbs-area-max" step="1">
+						</div>
+					</div>
+				</div>
+				<!-- area before intervention -->
+				<div class="filter-group">
+					<button class="filter-button" id="previous-area-filter">
+						Area Before Intervention
+					</button>
+					<div class="filter-panel" id="previous-area-panel">
+						<div class="filter-options" id="previous-area-options"></div>
+					</div>
+				</div>
+				<!-- nbs type -->
+				<div class="filter-group">
+					<button class="filter-button" id="nbs-type-filter">
+						NbS Type
+					</button>
+					<div class="filter-panel" id="nbs-type-panel">
+						<div class="filter-options" id="nbs-type-options"></div>
+					</div>
+				</div>
+				<!-- total cost -->
+				<div class="filter-group">
+					<button class="filter-button" id="cost-filter">
+						Total Cost
+					</button>
+					<div class="filter-panel" id="cost-panel">
+						<label id="cost-min-label"></label>
+						<input type="range" id="cost-min">
+						<label id="cost-max-label"></label>
+						<input type="range" id="cost-max">
+					</div>
+				</div>
+				<!-- sources of funding -->
+				<div class="filter-group">
+					<button class="filter-button" id="funding-filter">
+						Sources of Funding
+					</button>
+					<div class="filter-panel" id="funding-panel">
+						<div class="filter-options" id="funding-options"></div>
+					</div>
+				</div>
+				<!-- environmental impacts -->
+				<div class="filter-group">
+					<button class="filter-button" id="env-impact-filter">
+						Environmental Impacts
+					</button>
+					<div class="filter-panel" id="env-impact-panel">
+						<div class="filter-options" id="env-impact-options"></div>
+					</div>
+				</div>
+				<!-- economic impacts -->
+				<div class="filter-group">
+					<button class="filter-button" id="econ-impact-filter">
+						Economic Impacts
+					</button>
+					<div class="filter-panel" id="econ-impact-panel">
+						<div class="filter-options" id="econ-impact-options"></div>
+					</div>
+				</div>
+				
 			</div>
-		  </div>
-		  <!-- area before intervention -->
-		 <div class="filter-group">
-			<button class="filter-button" id="previous-area-filter">
-				Area Before Intervention
-			</button>
-			<div class="filter-panel" id="previous-area-panel">
-				<div class="filter-options" id="previous-area-options"></div>
+		</aside>
+
+		<main class="results-column">
+			<!-- results -->
+			<div id="results-panel">
+				<h1>Projects</h1>
+				<div id="results-count"></div>
+				<div id="results-list"></div>
 			</div>
-		 </div>
-		 <!-- nbs type -->
-		 <div class="filter-group">
-			<button class="filter-button" id="nbs-type-filter">
-				NbS Type
-			</button>
-			<div class="filter-panel" id="nbs-type-panel">
-				<div class="filter-options" id="nbs-type-options"></div>
-			</div>
-		 </div>
-		 <!-- total cost -->
-		 <div class="filter-group">
-			<button class="filter-button" id="cost-filter">
-				Total Cost
-			</button>
-			<div class="filter-panel" id="cost-panel">
-				<label id="cost-min-label"></label>
-				<input type="range" id="cost-min">
-				<label id="cost-max-label"></label>
-				<input type="range" id="cost-max">
-			</div>
-		  </div>
-		 <!-- sources of funding -->
-		 <div class="filter-group">
-			<button class="filter-button" id="funding-filter">
-				Sources of Funding
-			</button>
-			<div class="filter-panel" id="funding-panel">
-				<div class="filter-options" id="funding-options"></div>
-			</div>
-		 </div>
-		 <!-- environmental impacts -->
-		 <div class="filter-group">
-			<button class="filter-button" id="env-impact-filter">
-				Environmental Impacts
-			</button>
-			<div class="filter-panel" id="env-impact-panel">
-				<div class="filter-options" id="env-impact-options"></div>
-			</div>
-		 </div>
-		 <!-- economic impacts -->
-		 <div class="filter-group">
-			<button class="filter-button" id="econ-impact-filter">
-				Economic Impacts
-			</button>
-			<div class="filter-panel" id="econ-impact-panel">
-				<div class="filter-options" id="econ-impact-options"></div>
-			</div>
-		 </div>
-		
+		</main>
+
 	</div>
 
 

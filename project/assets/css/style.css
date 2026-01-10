@@ -115,3 +115,81 @@ header{
     font-size: 0.85rem;
     margin-bottom: 6px;
 }
+
+.active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.filter-tag {
+    background: #e6f0ff;
+    color: #003366;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.filter-tag button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+}
+
+#results-panel {
+    margin-top: 24px;
+    padding: 16px;
+    background: #fff;
+    border-radius: 8px;
+}
+
+.project-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 14px;
+    /* margin-bottom: 10px; */
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.project-card h4 {
+    margin: 0 0 6px;
+    font-size: 16px;
+}
+
+.project-meta {
+    font-size: 13px;
+    color: #555;
+}
+
+.page-layout {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    gap: 24px;
+    padding: 16px;
+}
+
+.filters-column {
+    background: #f9f9f9;
+    padding: 16px;
+    border-radius: 8px;
+    max-height: calc(100vh-120px);
+    overflow-y: auto;
+}
+
+.results-column {
+    padding: 8px;
+}
+
+#results-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    margin-top: 12px;
+}
