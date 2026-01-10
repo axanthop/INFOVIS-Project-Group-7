@@ -117,6 +117,9 @@ econImpactsFilter.addEventListener("click", () => {
     econImpactsPanel.classList.toggle("open");
 });
 
+// comparing procedure
+let comparingSet = new Set();
+
 
 let wholeData = [];
 let filteredData = [];
@@ -263,11 +266,25 @@ d3.csv("./assets/data/cleaned.csv").then(data => {
         applyFilters();
     });
 
+    document.getElementById("compare-button").addEventListener("click", () => {
+        let comparingProjects = wholeData.filter(d => 
+            comparingSet.has(d.intervention_name)
+        );
+        renderComparisonView(comparingProjects);
+        showComparisonView();
+    });
+
+    document.getElementById("clear-compare").addEventListener("click", () => {
+        comparingSet.clear();
+        renderResults(filteredData || wholeData);
+        updateCompareBar();
+    })
+
 });
 
 
 function applyFilters() {
-    let filteredData = wholeData;
+    filteredData = wholeData;
 
     // search
     if (filters.search) {
@@ -729,7 +746,7 @@ function renderActiveFilters() {
     filters.nbsType.forEach(type => {
         addActiveTag("NbS Type", type, () => {
             filters.nbsType.delete(type);
-            document.querySelector(`#nbs-type-options input[value="${type}"]`).forEach(cb => cb.checked = false);
+            document.querySelectorAll(`#nbs-type-options input[value="${type}"]`).forEach(cb => cb.checked = false);
             nbsTypeFilter.classList.toggle("active", filters.nbsType.size > 0);
             applyFilters();
         });
@@ -748,7 +765,7 @@ function renderActiveFilters() {
     filters.funding.forEach(funding => {
         addActiveTag("Sources of Funding", funding, () => {
             filters.funding.delete(funding);
-            document.querySelector(`#funding-options input[value="${funding}"]`).forEach(cb => cb.checked = false);
+            document.querySelectorAll(`#funding-options input[value="${funding}"]`).forEach(cb => cb.checked = false);
             fundingFilter.classList.toggle("active", filters.funding.size > 0);
             applyFilters();
         });
@@ -804,20 +821,102 @@ function renderResults(data) {
     data.forEach(d => {
         let projectCard = document.createElement("div");
         projectCard.className = "project-card";
+        let projectId = d.intervention_name;
 
         projectCard.innerHTML = `
-            <h4>${d.intervention_name || "Unnamed project"}</h4>
+            <div class="project-card-header">
+                <h4>${d.intervention_name || "Unnamed project"}</h4>
+            </div>
             <div class="project-meta">
                 <strong>Country:</strong> ${d.country || "-"} |
                 <strong>City:</strong> ${d.city || "-"} <br>
                 <strong>Start:</strong> ${d.begin_year || "-"} -
                 <strong>End:</strong> ${d.end_year || "-"} <br>
                 <strong>NbS Area:</strong> ${d.nbs_area || "-"} m2 |
-                <strong>Total Cost:</strong> ${d.total_cost || "-"} €
+                <strong>Total Cost:</strong> ${d.total_cost || "-"} € <br>
+                <label class="compare-option">
+                    <input type="checkbox" data-id="${projectId}">
+                    Compare
+                </label>
             </div>
             `;
 
+        let compareCheckbox = projectCard.querySelector('input[type="checkbox"]');
+        compareCheckbox.checked = comparingSet.has(projectId);
+
+        compareCheckbox.addEventListener("change", () => {
+            if (compareCheckbox.checked) {
+                comparingSet.add(projectId);
+            } else {
+                comparingSet.delete(projectId);
+            }
+            console.log("Comparing Set: ", [...comparingSet]);
+            updateCompareBar();
+        })
+        
         resultsList.appendChild(projectCard);
 
     });
+}
+
+function updateCompareBar() {
+    let compareBar = document.getElementById("compare-bar");
+    let compareCount = document.getElementById("compare-count");
+
+    if (comparingSet.size >= 2) {
+        compareBar.classList.remove("hidden");
+        compareCount.textContent = `${comparingSet.size} projects selected`;
+    } else {
+        compareBar.classList.add("hidden");
+    }
+}
+
+function renderComparisonView(projects) {
+    let comparisonResultsPanel = document.getElementById("comparison-results-panel");
+
+    comparisonResultsPanel.innerHTML = `
+    <h2>Project Comparison</h2>
+    <div class="comparison-grid"></div>`;
+    // <button id="back-to-results"><- Back to results</button> 
+
+    let comparisonGrid = comparisonResultsPanel.querySelector(".comparison-grid");
+
+    projects.forEach(p => {
+        let column = document.createElement("div");
+        column.className = "comparison-column";
+
+        column.innerHTML = `
+        <h3>${p.intervention_name}</h3>
+        <p><strong>Country:</strong> ${p.country}</p>
+        <p><strong>City:</strong> ${p.city}</p>
+        <p><strong>Start Year:</strong> ${p.begin_year}</p>
+        <p><strong>End Year:</strong> ${p.end_year}</p>
+        <p><strong>NbS Area:</strong> ${p.nbs_area}</p>
+        <p><strong>Area before Implementation:</strong> ${p.previous_area_type}</p>
+        <p><strong>NbS Type:</strong> ${p.nbs_type}</p>
+        <p><strong>Total Cost:</strong> ${p.total_cost}</p>
+        <p><strong>Sources of Funding:</strong> ${p.sources_of_funding}</p>
+        <p><strong>Environmental Impacts:</strong> ${p.environmental_impacts}</p>
+        <p><strong>Economic Impacts:</strong> ${p.economic_impacts}</p>`
+        ;
+
+        comparisonGrid.appendChild(column);
+    });
+
+    // document.getElementById("back-to-results").addEventListener("click", () => {
+    //     renderResults(filteredData || wholeData);
+    //     updateCompareBar();
+    //     showResultsView();
+    // });
+}
+
+function showComparisonView() {
+    document.getElementById("results-panel").classList.add("hidden");
+    document.getElementById("comparison-results-panel").classList.remove("hidden");
+    document.getElementById("search-bar").classList.add("hidden");
+}
+
+function showResultsView() {
+    document.getElementById("comparison-results-panel").classList.add("hidden");
+    document.getElementById("results-panel").classList.remove("hidden");
 }

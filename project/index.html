@@ -146,8 +146,17 @@
 
 		<main class="results-column">
 			<!-- results -->
-			 <!-- search bar -->
-			<div class="search-bar">
+			<!-- compare bar -->
+			<div id="compare-bar" class="compare-bar hidden">
+				<span id="compare-count"></span>
+				<button id="compare-button">Compare</button>
+				<button id="clear-compare">Clear</button>
+			</div>
+			<!-- comparison panel -->
+			 <div id="comparison-results-panel" class="hidden"></div>
+
+			<!-- search bar -->
+			<div class="search-bar" id="search-bar">
 			<input type="text" id="search-input" placeholder="Search project..."/>
 			</div>
 			 

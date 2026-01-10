@@ -205,3 +205,45 @@ header{
     border-radius: 6px;
     border: 1px solid #ccc;
 }
+
+.compare-bar {
+    position: sticky;
+    top: 0;
+    background: #003366;
+    color: white;
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    z-index: 20;
+}
+
+.compare-bar button {
+    background: white;
+    color: #003366;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.hidden {
+    display: none;
+}
+
+.comparison-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.comparison-column {
+    border: 1px solid #ddd;
+    padding: 12px;
+    border-radius: 8px;
+    background: #fff;
+}
