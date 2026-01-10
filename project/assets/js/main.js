@@ -10,7 +10,8 @@ let filters = {
     totalCost: [null, null],
     funding: new Set(),
     envImpacts: new Set(),
-    econImpacts: new Set()
+    econImpacts: new Set(),
+    search: ""
 };
 
 // country
@@ -139,6 +140,13 @@ d3.csv("./assets/data/cleaned.csv").then(data => {
     renderEconomicImpactsOptions(wholeData);
     initializeCostSlider(wholeData);
 
+    let searchBarInput = document.getElementById("search-input");
+
+    searchBarInput.addEventListener("input", (e) => {
+        filters.search = e.target.value.trim().toLowerCase();
+        applyFilters();
+    })
+
     countryOptions.addEventListener("change", (e) => {
         let checkbox = e.target;
         
@@ -260,6 +268,22 @@ d3.csv("./assets/data/cleaned.csv").then(data => {
 
 function applyFilters() {
     let filteredData = wholeData;
+
+    // search
+    if (filters.search) {
+        filteredData = filteredData.filter(d => {
+            let searchText = [
+                d.intervention_name,
+                d.country,
+                d.city,
+                d.nbs_type,
+                d.previous_area_type,
+                d.sources_of_funding
+            ].filter(Boolean).join(" ").toLocaleLowerCase();
+
+            return searchText.includes(filters.search);
+        })
+    }
     
     // county
     if (filters.countries.size > 0) {
@@ -626,6 +650,15 @@ function renderActiveFilters() {
     let activeContainer = document.getElementById("active-filters");
     activeContainer.innerHTML = "";
 
+    // search
+    if (filters.search) {
+        addActiveTag("Search", `"${filters.search}"`, () => {
+            filters.search = "";
+            document.getElementById("search-input").value = "";
+            applyFilters();
+        })
+    }
+
     // countries
     filters.countries.forEach(country => {
         addActiveTag("Country", country, () => {
@@ -777,7 +810,7 @@ function renderResults(data) {
             <div class="project-meta">
                 <strong>Country:</strong> ${d.country || "-"} |
                 <strong>City:</strong> ${d.city || "-"} <br>
-                <strong>Start:</strong> ${d.begin_year || "-"} |
+                <strong>Start:</strong> ${d.begin_year || "-"} -
                 <strong>End:</strong> ${d.end_year || "-"} <br>
                 <strong>NbS Area:</strong> ${d.nbs_area || "-"} m2 |
                 <strong>Total Cost:</strong> ${d.total_cost || "-"} €
