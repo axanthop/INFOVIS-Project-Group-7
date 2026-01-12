@@ -123,14 +123,25 @@ let comparingSet = new Set();
 
 let wholeData = [];
 let filteredData = [];
+let mapVisInstance;
 
-d3.csv("./assets/data/cleaned.csv").then(data => {
+Promise.all([d3.csv("./assets/data/cleaned.csv"), 
+             d3.csv("./assets/data/coordinates.csv"),
+             d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json")
+]).then(([data, cities, world]) => {
     
     wholeData = data;
     
+    mapVisInstance = new MapVis(
+        "map-container",
+        world,
+        cities
+    );
+
     // to show every project when open the page
     renderResults(wholeData);
-    
+    mapVisInstance.updateVis(wholeData);
+
     renderCountryOptions(wholeData);
     renderCityOptions(wholeData);
     renderStartYearOptions(wholeData);
@@ -280,6 +291,7 @@ d3.csv("./assets/data/cleaned.csv").then(data => {
         updateCompareBar();
     })
 
+    
 });
 
 
@@ -396,6 +408,8 @@ function applyFilters() {
 
     // console.log("Filtered Projects: ", filteredData);
     renderResults(filteredData);
+    mapVisInstance.updateVis(filteredData);
+
 }
 
 function renderCountryOptions(data) {

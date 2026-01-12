@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<meta name="description" content="Homework 2 tallest Building">
+		<meta name="description" content="INFOMVIS -Assignment">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>INFOMVIS - Assignment</title>
 
@@ -16,7 +16,7 @@
 	<body>
 	<header>
 		<div>
-			<a href="./index.html"><img src="\assets\img\naturvation_logo.png" class="header-img" alt="logo"></a>
+			<a href="./index.html"><img src="./assets/img/naturvation_logo.png" class="header-img" alt="logo"></a>
 		</div>
 		<nav class="nav">	
 			<a href="./database.html">Database</a>
@@ -159,6 +159,12 @@
 			<div class="search-bar" id="search-bar">
 			<input type="text" id="search-input" placeholder="Search project..."/>
 			</div>
+			<!-- map visualization -->
+			<div id="map-container" class="map-container"></div>
+			<div id="city-popup" class="hidden">
+				<button id="popup-close">X </button>
+				<div id="popup-content"></div>
+			</div>
 			 
 			<div id="results-panel">
 				<h1>Projects</h1>
@@ -176,6 +182,8 @@
 	<!-- d3 -->
 	<script src="https://d3js.org/d3.v7.min.js"></script>
 
+	<script src="https://d3js.org/topojson.v3.min.js"></script>
+	<script src="./assets/js/mapVis.js"></script>
 	<!-- own js files -->
 	<script src="./assets/js/main.js"></script>
 	</body>

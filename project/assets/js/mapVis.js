@@ -1,0 +1,126 @@
+class MapVis{
+    constructor(parentElement, WorldData, cityData){
+        this.parentElement = parentElement;
+        this.WorldData = WorldData;
+        this.cityData = cityData;
+
+        this.initVis();
+    }
+    initVis(){
+        let vis = this;
+
+        vis.margin = {top:20, right:20, bottom:20, left:20};
+        vis.width = document.getElementById(vis.parentElement).clientWidth- vis.margin.left-vis.margin.right;
+
+        vis.height = 450 - vis.margin.top-vis.margin.bottom;
+
+        
+        
+        vis.svg = d3.select("#"+vis.parentElement).append("svg")
+            .attr("width", vis.width+vis.margin.left+vis.margin.right)
+            .attr("height", vis.height+vis.margin.top+vis.margin.bottom)
+            .append("g")
+            .attr("transform",`translate(${vis.margin.left},${vis.margin.top})`);
+        
+
+        vis.projection = d3.geoNaturalEarth1()
+                        .scale(vis.height/3)
+                        .translate([vis.width/2, vis.height/2]);
+        
+        vis.path = d3.geoPath().projection(vis.projection);
+
+        vis.world = topojson.feature(vis.WorldData, vis.WorldData.objects.countries).features;
+
+        vis.svg.selectAll(".country")
+            .data(vis.world)
+            .enter()
+            .append("path")
+            .attr("class","country")
+            .attr("d", vis.path)
+            .attr("fill", "#ccc")
+            .attr("stroke","#999");
+        
+        vis.circlesGroup = vis.svg.append("g").attr("class", "city-circles");
+
+        d3.select("#popup-close").on("click", ()=> { d3.select("#city-popup").classed("hidden", true);});   
+    }
+    updateVis(data){
+        let vis = this;
+        let projectsByCity = d3.rollups(
+            data, 
+            v => v, 
+            d => `${d.city}|||${d.country}`
+        );
+
+        let citycounts = projectsByCity.map(([key, count])=>{
+            let [city, country] = key.split("|||");
+
+            let coords = vis.cityData.find(d=> d.city === city && d.country === country);
+
+            if (!coords) return null;
+
+            return {
+                city: city,
+                country: country,
+                projects: count,
+                count: count.length,
+                latitude: +coords.latitude,
+                longitude: +coords.longitude
+            };
+        }).filter(d=> d !== null);
+
+        vis.Circles(citycounts);
+    }
+
+    Circles(data) {
+        let vis = this;
+
+        let radiusScale = d3.scaleSqrt()
+            .domain([1, d3.max(data, d=> d.count)])
+            .range([2, 20]);
+        
+        let circles = vis.circlesGroup.selectAll(".city-circle")
+            .data(data, d=> d.city +d.country);
+        
+        circles.exit().remove();
+
+        circles 
+            .attr("cx", d=> vis.projection([d.longitude, d.latitude])[0])
+            .attr("cy", d=> vis.projection([d.longitude, d.latitude])[1])
+            .attr("r", d=> radiusScale(d.count));
+        
+        circles.enter()
+            .append("circle")
+            .attr("class", "city-circle")
+            .attr("cx", d=> vis.projection([d.longitude, d.latitude])[0])
+            .attr("cy", d=> vis.projection([d.longitude, d.latitude])[1])
+            .attr("r",0)
+            .on("click", (event, d)=> vis.showPop(event, d))
+            .transition()
+            .attr("r", d=> radiusScale(d.count));
+        }
+    
+    showPop(event, d){
+        let popup = d3.select("#city-popup");
+
+        popup.classed("hidden", false)
+            .style("left", (event.pageX+10)+"px")
+            .style("top", (event.pageY+10)+"px");
+
+        d3.select("#popup-content").html(`
+            <h4>${d.city}, ${d.country}</h4>
+            <p>Number of Projects: ${d.count}</p>
+            <ul>
+            ${d.projects.map(p => `<li>
+                ${p.intervention_name || "Unnamed Project"}
+                <button>more info</button>
+                <button>compare</button>
+                </li>`).join("")}
+            </ul>`);
+    }
+
+    // hidePop(){
+    //     // d3.select("#city-popup").classed("hidden", true);
+    //     d3.select("#popup-close").on("click", ()=> { d3.select("#city-popup").classed("hidden", true);});   
+    // }
+}
