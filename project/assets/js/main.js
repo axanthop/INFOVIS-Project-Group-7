@@ -123,10 +123,12 @@ let comparingSet = new Set();
 
 let wholeData = [];
 let filteredData = [];
+let radarMaxValues = null;
 
 d3.csv("./assets/data/cleaned.csv").then(data => {
     
     wholeData = data;
+    maxValuesRadar = computeRadarMaxValues(wholeData);
     
     // to show every project when open the page
     renderResults(wholeData);
@@ -271,6 +273,7 @@ d3.csv("./assets/data/cleaned.csv").then(data => {
             comparingSet.has(d.intervention_name)
         );
         renderComparisonView(comparingProjects);
+        renderRadarChart(comparingProjects);
         showComparisonView();
     });
 
@@ -872,9 +875,10 @@ function renderResults(data) {
                 // we getting the position of the card so to know where to open the hover panel
                 requestAnimationFrame(() => {
                     let panelRect = hoverProjectPanel.getBoundingClientRect();
-                    let viewWidth = window.innerWidth;
+                    // let viewWidth = window.innerWidth;
+                    let containerRec = document.getElementById("results-panel").getBoundingClientRect();
 
-                    if (panelRect.right > viewWidth) {
+                    if (panelRect.right > containerRec.right) {
                         hoverProjectPanel.style.left = "auto";
                         hoverProjectPanel.style.right = "100%";
                         hoverProjectPanel.style.marginLeft = "0";
@@ -961,10 +965,154 @@ function renderComparisonView(projects) {
 function showComparisonView() {
     document.getElementById("results-panel").classList.add("hidden");
     document.getElementById("comparison-results-panel").classList.remove("hidden");
+    document.getElementById("comparison-radar-container").classList.remove("hidden");
     document.getElementById("search-bar").classList.add("hidden");
 }
 
 function showResultsView() {
     document.getElementById("comparison-results-panel").classList.add("hidden");
+    document.getElementById("comparison-radar-container").classList.add("hidden");
     document.getElementById("results-panel").classList.remove("hidden");
+}
+
+
+// radar chart functions
+function radarData(projects) {
+    return projects.map(p => ({
+        name: p.intervention_name,
+        values: [
+            {axis: "NbS Area (m2)", value: +p.nbs_area},
+            {axis: "Total Cost (€)", value: +p.total_cost},
+            {axis: "Duration", value: +p.end_year - +p.begin_year},
+            // {axis: "Environmental Impacts", value: +p.environmental_impacts?.split(";").length || 0},
+            // {axis: "Economic Impacts", value: +p.economic_impacts?.split(";").length || 0}
+        ]
+    }));
+}
+
+function computeRadarMaxValues(data) {
+    return {
+        "NbS Area (m2)": d3.max(data, d => +d.nbs_area || 0) * 1.1,
+        // "Total Cost (€)": d3.max(data, d => +d.total_cost || 0) * 1.1,
+        "Duration": d3.max(data, d => (+d.end_year - +d.begin_year) || 0) * 1.1,
+
+        // because total_cost has very large numbers in comparison with the other two features
+        // we normilize the value of total_cost so it can be shown better in the visualization
+        "Total Cost (€)": Math.log10(d3.max(data, d => +d.total_cost || 1)) * 1.1
+    };
+}
+
+function changeDataForRadar(data) {
+    data.forEach(d => {
+        d.values.forEach(v => {
+            let value = v.value;
+            if (v.axis === "Total Cost (€)") {
+                value = Math.log10(Math.max(value, 1));
+            }
+            let max = maxValuesRadar[v.axis] || 1;
+            v.newValues = value/max;
+        });
+    });
+    return data;
+}
+
+function renderRadarChart(projects) {
+    let svg = d3.select("#radar-chart");
+    svg.selectAll("*").remove();
+
+    let width = 450;
+    let height = 450;
+    let radius = Math.min(width, height)/2-50;
+
+    svg.attr("viewBox", `0 0 ${width} ${height}`);
+
+    let g = svg.append("g").attr("transform", `translate(${width/2}, ${height/2})`);
+
+    let data = changeDataForRadar(radarData(projects));
+    let axes = data[0].values.map(d => d.axis);
+    let angleS = (Math.PI * 2)/axes.length;
+    let rScale = d3.scaleLinear().domain([0, 1]).range([0, radius]);
+
+    let levels = 5;
+    for (let i=1; i<=levels; i++) {
+        g.append("circle")
+                .attr("r", (radius/levels)*i)
+                .attr("fill", "none")
+                .attr("stroke", "#ddd");
+    }
+
+    let axisGroup = g.selectAll(".radar-axis")
+                        .data(axes)
+                        .enter()
+                        .append("g")
+                        .attr("class", "radar-axis");
+
+    axisGroup.append("line")
+                    .attr("x1", 0)
+                    .attr("y1", 0)
+                    .attr("x2", (d, i) => rScale(1)*Math.cos(angleS*i-Math.PI/2))
+                    .attr("y2", (d, i) => rScale(1)*Math.sin(angleS*i-Math.PI/2));
+
+    axisGroup.append("text")
+                    .attr("x", (d, i) => rScale(1)*Math.cos(angleS*i-Math.PI/2))
+                    .attr("y", (d, i) => rScale(1)*Math.sin(angleS*i-Math.PI/2))
+                    .style("text-anchor", "middle")
+                    .text(d => d);
+
+    let rLine = d3.lineRadial()
+                        .radius(d => rScale(d.newValues))
+                        .angle((d, i) => i * angleS)
+                        .curve(d3.curveLinearClosed);
+
+    let color = d3.scaleOrdinal(d3.schemeCategory10);
+
+    g.selectAll(".radar-area")
+                    .data(data)
+                    .enter()
+                    .append("path")
+                    .attr("class", "radar-area")
+                    .attr("d", d => rLine(d.values))
+                    .attr("fill", (d, i) => color(i))
+                    .attr("stroke", (d, i) => color(i));
+
+    data.forEach((d, i) => {
+        g.selectAll(`.radar-dot-${i}`)
+                            .data(d.values)
+                            .enter()
+                            .append("circle")
+                            .attr("class", "radar-dot")
+                            .attr("cx", (v, idx) =>
+                                rScale(v.newValues) * Math.cos(angleS*idx-Math.PI/2))
+                            .attr("cy", (v, idx) => 
+                                rScale(v.newValues) * Math.sin(angleS*idx-Math.PI/2))
+                            .attr("fill", color(i));
+    });
+
+    let legendGroup = svg.append("g")
+                            .attr("class", "radar-legend")
+                            .attr("transform", `translate(${width-160}, 40)`);
+    let legendHeight = 20;
+
+    let legend = legendGroup.selectAll(".legend-item")
+                            .data(data)
+                            .enter()
+                            .append("g")
+                            .attr("class", "legend-item")
+                            .attr("transform", (d, i) => `translate(0, ${i*legendHeight})`);
+    
+    legend.append("rect")
+                    .attr("width", 12)
+                    .attr("height", 12)
+                    .attr("y", -10)
+                    .attr("fill", (d, i) => color(i))
+                    .attr("stroke", (d, i) => color(i));
+    
+    // legend for the project name
+    legend.append("text")
+                    .attr("x", 18)
+                    .attr("y", 0)
+                    .attr("dy", "-0.2em")
+                    .style("font-size", "12px")
+                    .style("alignment-baseline", "middle")
+                    .text(d => d.name.length > 25 ? d.name.slice(0,25) + "...": d.name);
 }

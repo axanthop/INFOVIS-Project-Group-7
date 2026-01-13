@@ -269,3 +269,41 @@ header{
     border-radius: 8px;
     background: #fff;
 }
+
+#comparison-radar-container {
+    width: 100%;
+    max-width: 500px;
+    margin: 20px auto;
+}
+
+#radar-chart {
+    width: 100%;
+    height: 450px;
+}
+
+.radar-axis line {
+    stroke: #ccc;
+}
+
+.radar-axis text {
+    font-size: 12px;
+    fill: #333;
+}
+
+.radar-area {
+    fill-opacity: 0.25;
+    stroke-width: 2px;
+}
+
+.radar-dot {
+    r: 3;
+}
+
+.radar-legend {
+    fill: #333;
+}
+
+.radar-legend rect {
+    rx: 2;
+    ry: 2;
+}
