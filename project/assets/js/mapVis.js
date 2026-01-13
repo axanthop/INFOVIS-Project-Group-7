@@ -8,13 +8,11 @@ class MapVis{
     }
     initVis(){
         let vis = this;
-
+        vis.currentZoom = 1;
         vis.margin = {top:20, right:20, bottom:20, left:20};
         vis.width = document.getElementById(vis.parentElement).clientWidth- vis.margin.left-vis.margin.right;
 
         vis.height = 450 - vis.margin.top-vis.margin.bottom;
-
-        
         
         vis.svg = d3.select("#"+vis.parentElement).append("svg")
             .attr("width", vis.width+vis.margin.left+vis.margin.right)
@@ -22,6 +20,12 @@ class MapVis{
             .append("g")
             .attr("transform",`translate(${vis.margin.left},${vis.margin.top})`);
         
+        vis.contrainer = vis.svg.append("g")
+            .attr("transform", `translate(${vis.margin.left},${vis.margin.top})`);
+
+        vis.zoomGroup = vis.contrainer.append("g")
+            .attr("class", "zoom-group");
+
 
         vis.projection = d3.geoNaturalEarth1()
                         .scale(vis.height/3)
@@ -31,7 +35,7 @@ class MapVis{
 
         vis.world = topojson.feature(vis.WorldData, vis.WorldData.objects.countries).features;
 
-        vis.svg.selectAll(".country")
+        vis.zoomGroup.selectAll(".country")
             .data(vis.world)
             .enter()
             .append("path")
@@ -40,7 +44,36 @@ class MapVis{
             .attr("fill", "#ccc")
             .attr("stroke","#999");
         
-        vis.circlesGroup = vis.svg.append("g").attr("class", "city-circles");
+        vis.circlesGroup = vis.zoomGroup.append("g").attr("class", "city-circles");
+
+        vis.radiusScale = d3.scaleSqrt()
+            .range([1,4]);
+        
+        vis.zoom = d3.zoom()
+            .scaleExtent([1,10])
+            .on("zoom", (event)=>{
+                vis.currentZoom = event.transform.k;
+                vis.zoomGroup.attr("transform", event.transform);
+
+                vis.circlesGroup.selectAll("circle")
+                    .attr("r", d=> vis.radiusScale(d.count)/vis.currentZoom);
+            });
+        vis.svg.call(vis.zoom);
+        d3.select("#zoom_in").on("click",()=>{
+            vis.svg.transition()
+                .duration(300)
+                .call(vis.zoom.scaleBy, 1.5);
+        });
+        d3.select("#zoom_out").on("click",()=>{
+            vis.svg.transition()
+                .duration(300)
+                .call(vis.zoom.scaleBy, 0.5);
+        });
+        d3.select("#zoom_reset").on("click",()=>{
+            vis.svg.transition()
+                .duration(300)
+                .call(vis.zoom.transform,d3.zoomIdentity);
+        });
 
         d3.select("#popup-close").on("click", ()=> { d3.select("#city-popup").classed("hidden", true);});   
     }
@@ -77,7 +110,7 @@ class MapVis{
 
         let radiusScale = d3.scaleSqrt()
             .domain([1, d3.max(data, d=> d.count)])
-            .range([2, 20]);
+            .range([1,4]);
         
         let circles = vis.circlesGroup.selectAll(".city-circle")
             .data(data, d=> d.city +d.country);
@@ -87,7 +120,7 @@ class MapVis{
         circles 
             .attr("cx", d=> vis.projection([d.longitude, d.latitude])[0])
             .attr("cy", d=> vis.projection([d.longitude, d.latitude])[1])
-            .attr("r", d=> radiusScale(d.count));
+            .attr("r", d=> radiusScale(d.count)/vis.currentZoom);
         
         circles.enter()
             .append("circle")
@@ -97,7 +130,7 @@ class MapVis{
             .attr("r",0)
             .on("click", (event, d)=> vis.showPop(event, d))
             .transition()
-            .attr("r", d=> radiusScale(d.count));
+            .attr("r", d=> radiusScale(d.count)/vis.currentZoom);
         }
     
     showPop(event, d){
