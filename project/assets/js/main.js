@@ -147,6 +147,10 @@ d3.csv("./assets/data/cleaned.csv").then(data => {
     initializeCostSlider(wholeData);
     renderCountryBarChart(wholeData);
     renderCountryBarChartMiniVersion(wholeData);
+    renderCostHistogram(wholeData);
+    renderCostHistogramMiniVersion(wholeData);
+    renderTimeLine(wholeData);
+    renderTimeLineMiniVersion(wholeData);
 
     let searchBarInput = document.getElementById("search-input");
 
@@ -416,6 +420,18 @@ function applyFilters() {
 
     // bar chart
     renderCountryBarChart(filteredData);
+
+    // histogram mini
+    renderCostHistogramMiniVersion(filteredData);
+
+    // histogram
+    renderCostHistogram(filteredData);
+
+    // timeline mini
+    renderTimeLineMiniVersion(filteredData);
+
+    // timeline
+    renderTimeLine(filteredData);
 
     // console.log("Filtered Projects: ", filteredData);
     renderResults(filteredData);
@@ -1040,6 +1056,7 @@ function changeDataForRadar(data) {
 
 function renderRadarChart(projects) {
     let svg = d3.select("#radar-chart");
+    // to remove all content regarding svg
     svg.selectAll("*").remove();
 
     let width = 450;
@@ -1162,6 +1179,7 @@ function overviewProjectsCountry(data, topCountries = 15) {
 
 function renderCountryBarChartMiniVersion(data) {
     let svg = d3.select("#country-bar-chart-mini");
+    // to remove all content regarding svg
     svg.selectAll("*").remove();
 
     let margin = {top: 5, right: 5, bottom: 25, left: 5};
@@ -1211,10 +1229,19 @@ function openChartModal(type) {
     if (type === "country") {
         renderCountryBarChart(filteredData, "#chart-modal-svg");
     }
+
+    if (type === "cost") {
+        renderCostHistogram(filteredData, "#chart-modal-svg");
+    }
+
+    if (type === "year") {
+        renderTimeLine(filteredData, "#chart-modal-svg");
+    }
 }
 
 function renderCountryBarChart(data, svgSelector = "#country-bar-chart") {
     let svg = d3.select(svgSelector);
+    // to remove all content regarding svg
     svg.selectAll("*").remove();
 
     let margin = {top: 20, right: 20, bottom: 80, left: 50};
@@ -1276,4 +1303,271 @@ function moveCountryFromChart(country) {
 
     countryFilter.classList.toggle("active", filters.countries.size > 0);
     applyFilters();
+}
+
+// setting up the histogram part
+function settingUpCostHistogram(data, count = 10) {
+    let values = data.map(d => +d.total_cost).filter(v => !isNaN(v) && v > 0);
+
+    if (values.length === 0) return [];
+
+    let x = d3.scaleLinear()
+                    .domain(d3.extent(values))
+                    .nice();
+
+    let bins = d3.bin()
+                    .domain(x.domain())
+                    .thresholds(x.ticks(count))(values);
+
+    return {bins, xDomain: x.domain()};
+}
+
+function renderCostHistogramMiniVersion(data) {
+    let svg = d3.select("#cost-chart");
+    // to remove all content regarding svg
+    svg.selectAll("*").remove();
+
+    let margin = {top: 5, right: 5, bottom: 20, left: 5};
+    let width = 300 - margin.left - margin.right;
+    let height = 90 - margin.top - margin.bottom;
+
+    svg.attr("viewBox", `0 0 300 90`);
+
+    let g = svg.append("g")
+                    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    let histo = settingUpCostHistogram(data, 6);
+    if (!histo) return;
+
+    let x = d3.scaleLinear()
+                    .domain(histo.xDomain)
+                    .range([0, width]);
+
+    let y = d3.scaleLinear()
+                    .domain([0, d3.max(histo.bins, d => d.length)])
+                    .range([height, 0]);
+
+    svg.selectAll("rect")
+                .data(histo.bins)
+                .enter()
+                .append("rect")
+                .attr("x", d => x(d.x0))
+                .attr("y", d => y(d.length))
+                .attr("width", d => Math.max(0, x(d.x1) - x(d.x0) - 1))
+                .attr("height", d => height - y(d.length))
+                .attr("fill", "#69b3a2");
+
+    let xAxis = d3.axisBottom(x)
+                    .ticks(4)
+                    .tickFormat(d => `${d / 1e6}M €`);
+
+    g.append("g")
+            .attr("transform", `translate(0,${height})`)
+            .call(xAxis)
+            .selectAll("text")
+            .attr("font-size", "9px")
+            .attr("transform", "rotate(-30)")
+            .style("text-anchor", "middle");
+    
+    g.append("text")
+            .attr("x", width/2)
+            .attr("y", height+22)
+            .attr("text-anchor", "middle")
+            .attr("font-size", "9px")
+            .attr("fill", "#555");
+
+}
+
+function renderCostHistogram(data, svgSelector = "#chart-modal-svg") {
+    let svg = d3.select(svgSelector);
+    // to remove all content regarding svg
+    svg.selectAll("*").remove();
+
+    let margin = {top: 20, right: 20, bottom: 50, left: 60};
+    let width = 500 - margin.left - margin.right;
+    let height = 300 - margin.top - margin.bottom;
+
+    svg.attr("viewBox", `0 0 500 300`);
+
+    let g = svg.append("g")
+                    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    let histo = settingUpCostHistogram(data, 15);
+    if (!histo) return;
+
+    let x = d3.scaleLinear()
+                    .domain(histo.xDomain)
+                    .range([0, width]);
+
+    let y = d3.scaleLinear()
+                    .domain([0, d3.max(histo.bins, d => d.length)])
+                    .nice()
+                    .range([height, 0]);
+
+    g.append("g")
+            .attr("transform", `translate(0,${height})`)
+            .call(d3.axisBottom(x).ticks(6).tickFormat(d => `$${d / 1e6}M`));
+
+    g.append("g").call(d3.axisLeft(y));
+
+    g.selectAll(".bar")
+                .data(histo.bins)
+                .enter()
+                .append("rect")
+                .attr("class", "bar")
+                .attr("x", d => x(d.x0))
+                .attr("y", d => y(d.length))
+                .attr("width", d => Math.max(0, x(d.x1) - x(d.x0) - 1))
+                .attr("height", d => height - y(d.length))
+                .attr("fill", "#69b3a2");
+}
+
+// setting up the timeline
+function settingUpProjectsByYear(data) {
+    return d3.rollups(data, v => v.length, d => +d.begin_year)
+                                .filter(([year]) => !isNaN(year))
+                                .map((([year, count]) => ({
+                                    year: year,
+                                    count: count
+                                })))
+                                .sort((a,b) => a.year - b.year);
+}
+
+function renderTimeLineMiniVersion(data) {
+    let svg = d3.select("#year-chart");
+    // to remove all content regarding svg
+    svg.selectAll("*").remove();
+
+    let margin = {top: 8, right: 8, bottom: 22, left: 8};
+    let width = 300 - margin.left - margin.right;
+    let height = 90 - margin.top - margin.bottom;
+
+    svg.attr("viewBox", `0 0 300 90`);
+
+    let g = svg.append("g")
+                    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    let timel = settingUpProjectsByYear(data);
+    if (timel.length < 2) return;
+
+    let x = d3.scaleLinear()
+                    .domain(d3.extent(timel, d => d.year))
+                    .range([0, width]);
+
+    let y = d3.scaleLinear()
+                    .domain([0, d3.max(timel, d => d.count)])
+                    .range([height, 0]);
+
+    let timelineArea = d3.area()
+                            .x(d => x(d.year))
+                            .y0(height)
+                            .y1(d => d.count)
+                            .curve(d3.curveMonotoneX);
+
+    let timelineLine = d3.line()
+                            .x(d => x(d.year))
+                            .y(d => y(d.count))
+                            .curve(d3.curveMonotoneX);
+
+    g.append("path")
+                .datum(timel)
+                .attr("fill", "#69b3a2")
+                .attr("opacity", 0.4)
+                .attr("d", timelineArea);
+
+    g.append("path")
+                .datum(timel)
+                .attr("fill", "none")
+                .attr("stroke", "#2c7c6d")
+                .attr("stroke-width", 2)
+                .attr("d", timelineLine); 
+
+    let xAxis = d3.axisBottom(x)
+                    .ticks(4)
+                    .tickFormat(d3.format("d"));
+
+    g.append("g")
+            .attr("transform", `translate(0,${height})`)
+            .call(xAxis)
+            .selectAll("text")
+            .attr("font-size", "9px")
+            .attr("transform", "rotate(-30)")
+            .style("text-anchor", "middle");
+    
+    g.append("text")
+            .attr("x", width/2)
+            .attr("y", height+18)
+            .attr("text-anchor", "middle")
+            .attr("font-size", "9px")
+            .attr("fill", "#555");
+}
+
+function renderTimeLine(data, svgSelector = "#chart-modal-svg") {
+    let svg = d3.select(svgSelector);
+    // to remove all content regarding svg
+    svg.selectAll("*").remove();
+
+    let margin = {top: 20, right: 20, bottom: 50, left: 60};
+    let width = 500 - margin.left - margin.right;
+    let height = 300 - margin.top - margin.bottom;
+
+    svg.attr("viewBox", `0 0 500 300`);
+
+    let g = svg.append("g")
+                    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    let timel = settingUpProjectsByYear(data);
+    if (timel.length < 2) return;
+
+    let x = d3.scaleLinear()
+                    .domain(d3.extent(timel, d => d.year))
+                    .range([0, width]);
+
+    let y = d3.scaleLinear()
+                    .domain([0, d3.max(timel, d => d.count)])
+                    .nice()
+                    .range([height, 0]);
+
+    let timelineArea = d3.area()
+                            .x(d => x(d.year))
+                            .y0(height)
+                            .y1(d => d.count)
+                            .curve(d3.curveMonotoneX);
+
+    let timelineLine = d3.line()
+                            .x(d => x(d.year))
+                            .y(d => y(d.count))
+                            .curve(d3.curveMonotoneX);
+
+    g.append("path")
+                .datum(timel)
+                .attr("fill", "#69b3a2")
+                .attr("opacity", 0.35)
+                .attr("d", timelineArea);
+
+    g.append("path")
+                .datum(timel)
+                .attr("fill", "none")
+                .attr("stroke", "#2c7c6d")
+                .attr("stroke-width", 2.5)
+                .attr("d", timelineLine); 
+
+    g.append("g")
+            .attr("transform", `translate(0,${height})`)
+            .call(d3.axisBottom(x).ticks(6).tickFormat(d3.format("d")));
+
+    g.append("g").call(d3.axisLeft(y));
+
+    g.append("text")
+            .attr("x", width/2)
+            .attr("y", height+40)
+            .attr("text-anchor", "middle")
+            .text("Start Year");
+    
+    g.append("text")
+            .attr("x", -height/2)
+            .attr("y", -45)
+            .attr("transform", "rotate(-90)")
+            .attr("font-size", "9px")
+            .text("Number of Projects");
 }
