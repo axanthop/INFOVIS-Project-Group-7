@@ -128,6 +128,7 @@ let radarMaxValues = null;
 d3.csv("./assets/data/cleaned.csv").then(data => {
     
     wholeData = data;
+    filteredData = data;
     maxValuesRadar = computeRadarMaxValues(wholeData);
     
     // to show every project when open the page
@@ -144,6 +145,8 @@ d3.csv("./assets/data/cleaned.csv").then(data => {
     renderEnvironmentalImpactsOptions(wholeData);
     renderEconomicImpactsOptions(wholeData);
     initializeCostSlider(wholeData);
+    renderCountryBarChart(wholeData);
+    renderCountryBarChartMiniVersion(wholeData);
 
     let searchBarInput = document.getElementById("search-input");
 
@@ -267,6 +270,17 @@ d3.csv("./assets/data/cleaned.csv").then(data => {
 
         applyFilters();
     });
+
+    document.querySelectorAll(".overview-card").forEach(card => {
+        card.addEventListener("click", () => {
+            let chartType = card.dataset.chart;
+            openChartModal(chartType);
+        });
+    });
+
+    document.getElementById("close-modal").addEventListener("click", () => {
+        document.getElementById("chart-modal").classList.add("hidden");
+    })
 
     document.getElementById("compare-button").addEventListener("click", () => {
         let comparingProjects = wholeData.filter(d => 
@@ -396,6 +410,12 @@ function applyFilters() {
 
     // active filters
     renderActiveFilters();
+
+    // bar chart mini
+    renderCountryBarChartMiniVersion(filteredData);
+
+    // bar chart
+    renderCountryBarChart(filteredData);
 
     // console.log("Filtered Projects: ", filteredData);
     renderResults(filteredData);
@@ -967,12 +987,14 @@ function showComparisonView() {
     document.getElementById("comparison-results-panel").classList.remove("hidden");
     document.getElementById("comparison-radar-container").classList.remove("hidden");
     document.getElementById("search-bar").classList.add("hidden");
+    document.getElementById("overview-strip").classList.add("hidden");
 }
 
 function showResultsView() {
     document.getElementById("comparison-results-panel").classList.add("hidden");
     document.getElementById("comparison-radar-container").classList.add("hidden");
     document.getElementById("results-panel").classList.remove("hidden");
+    document.getElementById("overview-strip").classList.remove("hidden");
 }
 
 
@@ -1115,4 +1137,143 @@ function renderRadarChart(projects) {
                     .style("font-size", "12px")
                     .style("alignment-baseline", "middle")
                     .text(d => d.name.length > 25 ? d.name.slice(0,25) + "...": d.name);
+}
+
+// set up for the bar chart
+function overviewProjectsCountry(data, topCountries = 15) {
+    summed = d3.rollups(data, v => v.length, d => d.country || "Unknown")
+                        .map(([country, count]) => ({ country, count })).sort((a,b) => b.count - a.count);
+
+    if (summed.length <= topCountries) return summed;
+
+    let topC = summed.slice(0, topCountries);
+    let otherCountries = summed.slice(topCountries);
+    let otherCountriesCount = d3.sum(otherCountries, d => d.count);
+
+    topC.push({
+        country: "Other",
+        count: otherCountriesCount,
+        isOther: true
+    });
+
+    return topC;
+                    
+}
+
+function renderCountryBarChartMiniVersion(data) {
+    let svg = d3.select("#country-bar-chart-mini");
+    svg.selectAll("*").remove();
+
+    let margin = {top: 5, right: 5, bottom: 25, left: 5};
+    let width = 300 - margin.left - margin.right;
+    let height = 90 - margin.top - margin.bottom;
+
+    svg.attr("viewBox", `0 0 300 90`);
+
+    let g = svg.append("g")
+                    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    let sumOfCountryMini = overviewProjectsCountry(data, 6);
+
+    let x = d3.scaleBand()
+                    .domain(sumOfCountryMini.map(d => d.country))
+                    .range([0, width])
+                    .padding(0.3);
+
+    let y = d3.scaleLinear()
+                    .domain([0, d3.max(sumOfCountryMini, d => d.count)])
+                    .range([height, 0]);
+
+
+    svg.selectAll("rect")
+                .data(sumOfCountryMini)
+                .enter()
+                .append("rect")
+                .attr("x", d => x(d.country))
+                .attr("y", d => y(d.count))
+                .attr("width", x.bandwidth())
+                .attr("height", d => height - y(d.count))
+                .attr("fill", "#69b3a2");
+
+    g.append("g")
+            .attr("transform", `translate(0,${height})`)
+            .call(d3.axisBottom(x).tickSize(0))
+            .selectAll("text")
+            .attr("font-size", "9px")
+            .attr("transform", "rotate(-40)")
+            .style("text-anchor", "end");
+
+}
+
+function openChartModal(type) {
+    document.getElementById("chart-modal").classList.remove("hidden");
+
+    if (type === "country") {
+        renderCountryBarChart(filteredData, "#chart-modal-svg");
+    }
+}
+
+function renderCountryBarChart(data, svgSelector = "#country-bar-chart") {
+    let svg = d3.select(svgSelector);
+    svg.selectAll("*").remove();
+
+    let margin = {top: 20, right: 20, bottom: 80, left: 50};
+    let width = 500 - margin.left - margin.right;
+    let height = 300 - margin.top - margin.bottom;
+
+    svg.attr("viewBox", `0 0 500 300`);
+
+    let g = svg.append("g")
+                    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    let sumOfCountry = overviewProjectsCountry(data, 15);
+
+    let x = d3.scaleBand()
+                    .domain(sumOfCountry.map(d => d.country))
+                    .range([0, width])
+                    .padding(0.2);
+
+    let y = d3.scaleLinear()
+                    .domain([0, d3.max(sumOfCountry, d => d.count)])
+                    .nice()
+                    .range([height, 0]);
+
+    g.append("g")
+            .attr("transform", `translate(0,${height})`)
+            .call(d3.axisBottom(x))
+            .selectAll("text")
+            .attr("transform", "rotate(-45)")
+            .style("text-anchor", "end");
+
+    g.append("g").call(d3.axisLeft(y));
+
+    g.selectAll(".bar")
+                .data(sumOfCountry)
+                .enter()
+                .append("rect")
+                .attr("class", "bar")
+                .attr("x", d => x(d.country))
+                .attr("y", d => y(d.count))
+                .attr("width", x.bandwidth())
+                .attr("height", d => height - y(d.count))
+                .attr("fill", d => filters.countries.has(d.country) ? "#949ba7" : "#69b3a2")
+                .style("cursor", "pointer")
+                .on("click", (event, d) => {
+                    if (d.isOther) return;
+                    moveCountryFromChart(d.country);
+                });
+
+}
+
+function moveCountryFromChart(country) {
+    if (filters.countries.has(country)) {
+        filters.countries.delete(country);
+        document.querySelectorAll(`#country-options input[value="${country}"]`).forEach(cb => cb.checked = false);
+    } else {
+        filters.countries.add(country);
+        document.querySelectorAll(`#country-options input[value="${country}"]`).forEach(cb => cb.checked = true);
+    }
+
+    countryFilter.classList.toggle("active", filters.countries.size > 0);
+    applyFilters();
 }

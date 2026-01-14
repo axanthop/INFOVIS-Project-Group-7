@@ -16,7 +16,7 @@
 	<body>
 	<header>
 		<div>
-			<a href="./index.html"><img src="\assets\img\naturvation_logo.png" class="header-img" alt="logo"></a>
+			<a href="./index.html"><img src="/project/assets/img/naturvation_logo.png" class="header-img" alt="logo"></a>
 		</div>
 		<nav class="nav">	
 			<a href="./database.html">Database</a>
@@ -161,6 +161,31 @@
 			<!-- search bar -->
 			<div class="search-bar" id="search-bar">
 			<input type="text" id="search-input" placeholder="Search project..."/>
+			</div>
+
+			<div id="overview-strip">
+				<div id="chart-modal" class="hidden">
+					<div class="modal-content">
+						<button id="close-modal">x</button>
+						<svg id="chart-modal-svg"></svg>
+					</div>
+				</div>
+
+				<div class="overview-card" data-chart="country">
+					<h4>Project by Country</h4>
+					<svg id="country-bar-chart-mini"></svg>
+				</div>
+
+				<div class="overview-card" data-chart="cost">
+					<h4>Cost Distribution</h4>
+					<svg id="cost-chart"></svg>
+				</div>
+
+				<div class="overview-card" data-chart="year">
+					<h4>Project by Year</h4>
+					<svg id="year-chart"></svg>
+				</div>
+
 			</div>
 			 
 			<div id="results-panel">
