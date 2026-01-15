@@ -117,6 +117,9 @@ econImpactsFilter.addEventListener("click", () => {
     econImpactsPanel.classList.toggle("open");
 });
 
+//pie filter
+window.selectedMetrics = "nbs_type";
+
 // comparing procedure
 let comparingSet = new Set();
 
@@ -409,6 +412,11 @@ function applyFilters() {
     // console.log("Filtered Projects: ", filteredData);
     renderResults(filteredData);
     mapVisInstance.updateVis(filteredData);
+
+    d3.select("#pie-metric").on("change", function(){
+        window.selectedMetrics =this.value;
+        mapVisInstance.updateVis(filteredData);
+    })
 
 }
 

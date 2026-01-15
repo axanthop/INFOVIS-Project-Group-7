@@ -140,6 +140,22 @@
 						<div class="filter-options" id="econ-impact-options"></div>
 					</div>
 				</div>
+				<!--Pie filter-->
+				<div class="filter-group">
+					<button class="filter-button">
+						Pie Cateogy
+					</button>
+					<div class="filter-panel open">
+						<select id="pie-metric" class="form-select">
+							<option value="nbs_type">NBS Type</option>
+							<option value="previous_area_type">Area before implementation</option>
+							<option value="sources_of_funding">Sources of Funding</option>
+							<option value="environmental_impacts">Environmental Impact</option>
+							<option value="economic_impacts">Economic Impact</option>
+						</select>
+
+					</div>
+				</div>
 				
 			</div>
 		</aside>
@@ -170,7 +186,9 @@
 				<button id="popup-close">X </button>
 				<div id="popup-content"></div>
 			</div>
-			 
+			<!--Legend-->
+			<div id="pie-legend" class="pie-legend"></div>
+
 			<div id="results-panel">
 				<h1>Projects</h1>
 				<div id="results-count"></div>

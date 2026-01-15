@@ -11,8 +11,8 @@ class MapVis{
         vis.currentZoom = 1;
         vis.margin = {top:20, right:20, bottom:20, left:20};
         vis.width = document.getElementById(vis.parentElement).clientWidth- vis.margin.left-vis.margin.right;
-
         vis.height = 450 - vis.margin.top-vis.margin.bottom;
+        vis.pieradius = 10;
         
         vis.svg = d3.select("#"+vis.parentElement).append("svg")
             .attr("width", vis.width+vis.margin.left+vis.margin.right)
@@ -35,6 +35,8 @@ class MapVis{
 
         vis.world = topojson.feature(vis.WorldData, vis.WorldData.objects.countries).features;
 
+        vis.arc =d3.arc;
+
         vis.zoomGroup.selectAll(".country")
             .data(vis.world)
             .enter()
@@ -44,7 +46,9 @@ class MapVis{
             .attr("fill", "#ccc")
             .attr("stroke","#999");
         
-        vis.circlesGroup = vis.zoomGroup.append("g").attr("class", "city-circles");
+       // vis.circlesGroup = vis.zoomGroup.append("g").attr("class", "city-circles");
+
+        vis.glyphGroup = vis.zoomGroup.append("g").attr("class", "city-glyphs");
 
         vis.radiusScale = d3.scaleSqrt()
             .range([1,4]);
@@ -55,9 +59,16 @@ class MapVis{
                 vis.currentZoom = event.transform.k;
                 vis.zoomGroup.attr("transform", event.transform);
 
-                vis.circlesGroup.selectAll("circle")
-                    .attr("r", d=> vis.radiusScale(d.count)/vis.currentZoom);
+                // vis.circlesGroup.selectAll("circle")
+                //     .attr("r", d=> vis.radiusScale(d.count)/vis.currentZoom);
             });
+
+        vis.zoomGroup.selectAll(".pie-slice")
+            .attr("d",d=>
+                vis.arc
+                    .innerRadius(0)
+                    .outerRadius(vis.pieradius/vis.currentZoom)(d)
+            );
         vis.svg.call(vis.zoom);
         d3.select("#zoom_in").on("click",()=>{
             vis.svg.transition()
@@ -102,8 +113,105 @@ class MapVis{
             };
         }).filter(d=> d !== null);
 
-        vis.Circles(citycounts);
+       // vis.Circles(citycounts);
+       vis.pieglyph(citycounts);
     }
+    pieglyph(data){
+        let vis = this;
+        let allcat=new Set();
+
+        let pierad= vis.pieradius/vis.currentZoom;
+
+        const pie = d3.pie()
+            .value(d=>d.value)
+            .sort(null);
+
+        const colorScale = d3.scaleOrdinal(d3.schemeTableau10);
+
+        data.forEach(d=>{
+            d.projects.forEach(p=>{
+                allcat.add(p[window.selectedMetrics] || "Unknown");
+            });
+        })
+
+        const categories = Array.from(allcat);
+
+        let glyphs= vis.glyphGroup
+            .selectAll(".city-glyph")
+            .data(data, d=>d.city+d.country);
+
+        glyphs.exit().remove();
+
+        let glyphsEnter = glyphs.enter()
+            .append("g")
+            .attr("class", "city-glyph")
+            .on("click", (event,d)=>vis.showPop(event,d));
+        
+        glyphs = glyphsEnter.merge(glyphs);
+
+        glyphs.attr("transform",d=>{
+            const [x,y] = vis.projection([d.longitude, d.latitude]);
+            return `translate(${x},${y})`;
+        });
+
+
+        glyphs.each(function(d){
+            let glyph = d3.select(this);
+
+        
+            const pieData = d3.rollups(
+                d.projects,
+                v=>v.length,
+                p=>p[window.selectedMetrics] || "Unknown").map(([key, value])=>({key, value}));
+
+            const radius = Math.max(2, vis.radiusScale(d.count || 1)/vis.currentZoom);
+
+            const arc = d3.arc()
+                .innerRadius(0)
+                .outerRadius(radius);
+
+            const arcs= pie(pieData);
+                
+            glyph.selectAll("path")
+                .data(pie(pieData),d=>d.data.key)
+                .join(
+                    enter => enter.append("path")
+                        .attr("d",arc)
+                        .attr("fill", d=>colorScale(d.data.key))
+                        .attr("stroke", "#999")
+                        .attr("stroke-width", 0.3)
+                    ,
+                    update => update
+                        .attr("d", arc)
+                        .attr("fill", d=>colorScale(d.data.key)),
+
+                    exit => exit.remove()
+                );
+    });
+    vis.updateLegend(categories, colorScale);
+}
+
+    updateLegend(categories, colorScale){
+        let legend = d3.select("#pie-legend");
+
+        legend.html("");
+
+        let items= legend.selectAll(".legend-item")
+            .data(categories)
+            .enter()
+            .append("div")
+            .attr("class", "legend-item");
+
+        items.append("span")
+            .attr("class", "legend-color")
+            .style("background-color", d=>colorScale(d));
+
+        items.append("span")
+            .attr("class", "legend-label")
+            .text(d=>d);
+
+    }
+
 
     Circles(data) {
         let vis = this;
