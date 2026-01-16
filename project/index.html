@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<meta name="description" content="Homework 2 tallest Building">
+		<meta name="description" content="INFOMVIS -Assignment">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>INFOMVIS - Assignment</title>
 
@@ -16,34 +16,197 @@
 	<body>
 	<header>
 		<div>
-			<a href="./index.html"><img src="\assets\img\naturvation_logo.png" class="header-img" alt="logo"></a>
+			<a href="./index.html"><img src="./assets/img/naturvation_logo.png" class="header-img" alt="logo"></a>
 		</div>
 		<nav class="nav">	
 			<a href="./database.html">Database</a>
 		</nav>
 	</header>
-	<main>
-		<aside>
-			<h2>Filters</h2>
-				<div id="filter-nbs"></div>
-				<div id="filter-area"></div>
-				<div id="filter-cost"></div>
-				<div id="filter-country"></div>
-				<div id="filter-city"></div>
-				<div id="filter-scale"></div>
-				<div id="filter-begin"></div>
-				<div id="filter-end"></div>
+
+	<div class="page-layout">
+
+		<aside class="filters-column">
+			<!-- filters -->
+			<div id="filters">
+
+				<!-- active filters -->
+				<div class="active-filters" id="active-filters"></div>
+				<!-- country -->
+				<div class="filter-group">
+					<button class="filter-button" id="country-filter">
+						Country
+					</button>
+					<div class="filter-panel" id="country-panel">
+						<div class="filter-options" id="country-options"></div>
+					</div>
+				</div>
+				<!-- city -->
+				<div class="filter-group">
+					<button class="filter-button" id="city-filter">
+						City
+					</button>
+					<div class="filter-panel" id="city-panel">
+						<div class="filter-options" id="city-options"></div>
+					</div>
+				</div>
+				<!-- start year -->
+				<div class="filter-group">
+					<button class="filter-button" id="start-year-filter">
+						Start Year
+					</button>
+					<div class="filter-panel" id="start-year-panel">
+						<div class="year-grid" id="start-year-options"></div>
+					</div>
+				</div>
+				<!-- end year -->
+				<div class="filter-group">
+					<button class="filter-button" id="end-year-filter">
+						End Year
+					</button>
+					<div class="filter-panel" id="end-year-panel">
+						<div class="year-grid" id="end-year-options"></div>
+					</div>
+				</div>
+				<!-- nbs area -->
+				<div class="filter-group">
+					<button class="filter-button" id="nbs-area-filter">
+						NbS Area (m2)
+					</button>
+					<div class="filter-panel" id="nbs-area-panel">
+						<div class="filter-options nbs-area-slider">
+							<div class="range-values">
+								<span id="nbs-area-min-label"></span>
+								<span id="nbs-area-max-label"></span>
+							</div>
+							<input type="range" id="nbs-area-min" step="1">
+							<input type="range" id="nbs-area-max" step="1">
+						</div>
+					</div>
+				</div>
+				<!-- area before intervention -->
+				<div class="filter-group">
+					<button class="filter-button" id="previous-area-filter">
+						Area Before Intervention
+					</button>
+					<div class="filter-panel" id="previous-area-panel">
+						<div class="filter-options" id="previous-area-options"></div>
+					</div>
+				</div>
+				<!-- nbs type -->
+				<div class="filter-group">
+					<button class="filter-button" id="nbs-type-filter">
+						NbS Type
+					</button>
+					<div class="filter-panel" id="nbs-type-panel">
+						<div class="filter-options" id="nbs-type-options"></div>
+					</div>
+				</div>
+				<!-- total cost -->
+				<div class="filter-group">
+					<button class="filter-button" id="cost-filter">
+						Total Cost
+					</button>
+					<div class="filter-panel" id="cost-panel">
+						<label id="cost-min-label"></label>
+						<input type="range" id="cost-min">
+						<label id="cost-max-label"></label>
+						<input type="range" id="cost-max">
+					</div>
+				</div>
+				<!-- sources of funding -->
+				<div class="filter-group">
+					<button class="filter-button" id="funding-filter">
+						Sources of Funding
+					</button>
+					<div class="filter-panel" id="funding-panel">
+						<div class="filter-options" id="funding-options"></div>
+					</div>
+				</div>
+				<!-- environmental impacts -->
+				<div class="filter-group">
+					<button class="filter-button" id="env-impact-filter">
+						Environmental Impacts
+					</button>
+					<div class="filter-panel" id="env-impact-panel">
+						<div class="filter-options" id="env-impact-options"></div>
+					</div>
+				</div>
+				<!-- economic impacts -->
+				<div class="filter-group">
+					<button class="filter-button" id="econ-impact-filter">
+						Economic Impacts
+					</button>
+					<div class="filter-panel" id="econ-impact-panel">
+						<div class="filter-options" id="econ-impact-options"></div>
+					</div>
+				</div>
+				<!--Pie filter-->
+				<div class="filter-group">
+					<button class="filter-button">
+						Pie Cateogy
+					</button>
+					<div class="filter-panel open">
+						<select id="pie-metric" class="form-select">
+							<option value="nbs_type">NBS Type</option>
+							<option value="previous_area_type">Area before implementation</option>
+							<option value="sources_of_funding">Sources of Funding</option>
+							<option value="environmental_impacts">Environmental Impact</option>
+							<option value="economic_impacts">Economic Impact</option>
+						</select>
+
+					</div>
+				</div>
+				
+			</div>
 		</aside>
-		<section class="map-section">
-			<svg id="map"></svg>
-		</section>
-	</main>
+
+		<main class="results-column">
+			<!-- results -->
+			<!-- compare bar -->
+			<div id="compare-bar" class="compare-bar hidden">
+				<span id="compare-count"></span>
+				<button id="compare-button">Compare</button>
+				<button id="clear-compare">Clear</button>
+			</div>
+			<!-- comparison panel -->
+			 <div id="comparison-results-panel" class="hidden"></div>
+
+			<!-- search bar -->
+			<div class="search-bar" id="search-bar">
+			<input type="text" id="search-input" placeholder="Search project..."/>
+			</div>
+			<!-- map visualization -->
+			<div id="map-controls">
+				<button id="zoom_in">+</button>
+				<button id="zoom_out">-</button>
+				<button id="zoom_reset">Reset</button>
+			</div>
+			<div id="map-container" class="map-container"></div>
+			<div id="city-popup" class="hidden">
+				<button id="popup-close">X </button>
+				<div id="popup-content"></div>
+			</div>
+			<!--Legend-->
+			<div id="pie-legend" class="pie-legend"></div>
+
+			<div id="results-panel">
+				<h1>Projects</h1>
+				<div id="results-count"></div>
+				<div id="results-list"></div>
+			</div>
+		</main>
+
+	</div>
+
+
 	<!-- embedding JS libraries -->
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
 
 	<!-- d3 -->
 	<script src="https://d3js.org/d3.v7.min.js"></script>
 
+	<script src="https://d3js.org/topojson.v3.min.js"></script>
+	<script src="./assets/js/mapVis.js"></script>
 	<!-- own js files -->
 	<script src="./assets/js/main.js"></script>
 	</body>
