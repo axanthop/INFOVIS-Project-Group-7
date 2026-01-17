@@ -1,13 +1,26 @@
+let mapVisInstance;
 
-d3.csv("./assets/data/cleaned.csv").then(data => {
+Promise.all([d3.csv("./assets/data/cleaned.csv"), 
+             d3.csv("./assets/data/coordinates.csv"),
+             d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json")
+]).then(([data, cities, world]) => {
     
     wholeData = data;
     filteredData = data;
     maxValuesRadar = computeRadarMaxValues(wholeData);
     
+    mapVisInstance = new MapVis(
+        "map-container",
+        world,
+        cities
+    );
+
+    mapVisInstance.updateVis(wholeData);
+    
     // to show every project when open the page
     renderResults(wholeData);
-    
+    mapVisInstance.updateVis(wholeData);
+
     renderCountryOptions(wholeData);
     renderCityOptions(wholeData);
     renderStartYearOptions(wholeData);

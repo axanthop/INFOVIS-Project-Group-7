@@ -233,6 +233,13 @@ function applyFilters() {
 
     // console.log("Filtered Projects: ", filteredData);
     renderResults(filteredData);
+
+    mapVisInstance.updateVis(filteredData);
+
+    d3.select("#pie-metric").on("change", function(){
+        window.selectedMetrics =this.value;
+        mapVisInstance.updateVis(filteredData);
+    })
 }
 
 

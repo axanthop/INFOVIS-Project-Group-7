@@ -140,7 +140,22 @@
 						<div class="filter-options" id="econ-impact-options"></div>
 					</div>
 				</div>
-				
+				<!--Pie filter-->
+				<div class="filter-group">
+					<button class="filter-button">
+						Pie Cateogy
+					</button>
+					<div class="filter-panel open">
+						<select id="pie-metric" class="form-select">
+							<option value="nbs_type">NBS Type</option>
+							<option value="previous_area_type">Area before implementation</option>
+							<option value="sources_of_funding">Sources of Funding</option>
+							<option value="environmental_impacts">Environmental Impact</option>
+							<option value="economic_impacts">Economic Impact</option>
+						</select>
+
+					</div>
+				</div>
 			</div>
 		</aside>
 
@@ -187,6 +202,19 @@
 				</div>
 
 			</div>
+			<!-- map visualization -->
+			<div id="map-controls">
+				<button id="zoom_in">+</button>
+				<button id="zoom_out">-</button>
+				<button id="zoom_reset">Reset</button>
+			</div>
+			<div id="map-container" class="map-container"></div>
+			<div id="city-popup" class="hidden">
+				<button id="popup-close">X </button>
+				<div id="popup-content"></div>
+			</div>
+			<!--Legend-->
+			<div id="pie-legend" class="pie-legend"></div>
 			 
 			<div id="results-panel">
 				<h1>Projects</h1>
@@ -203,11 +231,14 @@
 
 	<!-- d3 -->
 	<script src="https://d3js.org/d3.v7.min.js"></script>
+	<script src="https://d3js.org/topojson.v3.min.js"></script>
+
 
 	<!-- own js files -->
 	<script src="./assets/js/state.js"></script>
 	<script src="./assets/js/filters.js"></script>
 	<script src="./assets/js/charts.js"></script>
+	<script src="./assets/js/mapVis.js"></script>
 	<script src="./assets/js/main.js"></script>
 	</body>
 </html>
