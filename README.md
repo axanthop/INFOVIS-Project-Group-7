@@ -1,4 +1,4 @@
-# INFOVIS-Project-Group-8
+# INFOVIS-Project-Group-7
 
 ## To run the recommender system:
     Install: `pip install fastapi uvicorn pandas numpy python-multipart`  
