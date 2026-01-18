@@ -7,7 +7,8 @@
 		<title>INFOMVIS - Assignment</title>
 
 		<!-- Load CSS libraries -->
-		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+			  integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
 		<link rel="stylesheet" href="./assets/css/style.css">
 
 		<!-- GOOGLE FONTS -->
@@ -18,7 +19,7 @@
 		<div>
 			<a href="./index.html"><img src="/project/assets/img/naturvation_logo.png" class="header-img" alt="logo"></a>
 		</div>
-		<nav class="nav">	
+		<nav class="nav">
 			<a href="./database.html">Database</a>
 		</nav>
 	</header>
@@ -29,49 +30,72 @@
 			<!-- filters -->
 			<div id="filters">
 
+				<!-- ===== Recommandation (RS) PANEL ===== -->
+				<div class="filter-group">
+					<button class="filter-button" id="rs-filter">Recommandation</button>
+					<div class="filter-panel" id="rs-panel">
+
+						<div class="mb-2">
+							<div class="fw-semibold">Available</div>
+							<div id="rs-available" class="rs-list"></div>
+						</div>
+
+						<div class="mb-2">
+							<div class="fw-semibold">Use for recommendation</div>
+							<div id="rs-selected" class="rs-list rs-selected"></div>
+						</div>
+
+						<div id="rs-preferences" class="mt-2"></div>
+
+						<div class="mt-2">
+							<label class="form-label">Number of recommendations (k): <span id="rs-k-label">5</span></label>
+							<input id="rs-k" type="range" min="3" max="10" value="5" class="form-range">
+						</div>
+
+						<button id="rs-run" class="btn btn-primary btn-sm w-100 mt-2">Get recommendations</button>
+					</div>
+				</div>
+				<!-- ===== END Recommandation PANEL ===== -->
+
+
 				<!-- active filters -->
 				<div class="active-filters" id="active-filters"></div>
+
 				<!-- country -->
 				<div class="filter-group">
-					<button class="filter-button" id="country-filter">
-						Country
-					</button>
+					<button class="filter-button" id="country-filter">Country</button>
 					<div class="filter-panel" id="country-panel">
 						<div class="filter-options" id="country-options"></div>
 					</div>
 				</div>
+
 				<!-- city -->
 				<div class="filter-group">
-					<button class="filter-button" id="city-filter">
-						City
-					</button>
+					<button class="filter-button" id="city-filter">City</button>
 					<div class="filter-panel" id="city-panel">
 						<div class="filter-options" id="city-options"></div>
 					</div>
 				</div>
+
 				<!-- start year -->
 				<div class="filter-group">
-					<button class="filter-button" id="start-year-filter">
-						Start Year
-					</button>
+					<button class="filter-button" id="start-year-filter">Start Year</button>
 					<div class="filter-panel" id="start-year-panel">
 						<div class="year-grid" id="start-year-options"></div>
 					</div>
 				</div>
+
 				<!-- end year -->
 				<div class="filter-group">
-					<button class="filter-button" id="end-year-filter">
-						End Year
-					</button>
+					<button class="filter-button" id="end-year-filter">End Year</button>
 					<div class="filter-panel" id="end-year-panel">
 						<div class="year-grid" id="end-year-options"></div>
 					</div>
 				</div>
+
 				<!-- nbs area -->
 				<div class="filter-group">
-					<button class="filter-button" id="nbs-area-filter">
-						NbS Area (m2)
-					</button>
+					<button class="filter-button" id="nbs-area-filter">NbS Area (m2)</button>
 					<div class="filter-panel" id="nbs-area-panel">
 						<div class="filter-options nbs-area-slider">
 							<div class="range-values">
@@ -83,29 +107,26 @@
 						</div>
 					</div>
 				</div>
+
 				<!-- area before intervention -->
 				<div class="filter-group">
-					<button class="filter-button" id="previous-area-filter">
-						Area Before Intervention
-					</button>
+					<button class="filter-button" id="previous-area-filter">Area Before Intervention</button>
 					<div class="filter-panel" id="previous-area-panel">
 						<div class="filter-options" id="previous-area-options"></div>
 					</div>
 				</div>
+
 				<!-- nbs type -->
 				<div class="filter-group">
-					<button class="filter-button" id="nbs-type-filter">
-						NbS Type
-					</button>
+					<button class="filter-button" id="nbs-type-filter">NbS Type</button>
 					<div class="filter-panel" id="nbs-type-panel">
 						<div class="filter-options" id="nbs-type-options"></div>
 					</div>
 				</div>
+
 				<!-- total cost -->
 				<div class="filter-group">
-					<button class="filter-button" id="cost-filter">
-						Total Cost
-					</button>
+					<button class="filter-button" id="cost-filter">Total Cost</button>
 					<div class="filter-panel" id="cost-panel">
 						<label id="cost-min-label"></label>
 						<input type="range" id="cost-min">
@@ -113,38 +134,34 @@
 						<input type="range" id="cost-max">
 					</div>
 				</div>
+
 				<!-- sources of funding -->
 				<div class="filter-group">
-					<button class="filter-button" id="funding-filter">
-						Sources of Funding
-					</button>
+					<button class="filter-button" id="funding-filter">Sources of Funding</button>
 					<div class="filter-panel" id="funding-panel">
 						<div class="filter-options" id="funding-options"></div>
 					</div>
 				</div>
+
 				<!-- environmental impacts -->
 				<div class="filter-group">
-					<button class="filter-button" id="env-impact-filter">
-						Environmental Impacts
-					</button>
+					<button class="filter-button" id="env-impact-filter">Environmental Impacts</button>
 					<div class="filter-panel" id="env-impact-panel">
 						<div class="filter-options" id="env-impact-options"></div>
 					</div>
 				</div>
+
 				<!-- economic impacts -->
 				<div class="filter-group">
-					<button class="filter-button" id="econ-impact-filter">
-						Economic Impacts
-					</button>
+					<button class="filter-button" id="econ-impact-filter">Economic Impacts</button>
 					<div class="filter-panel" id="econ-impact-panel">
 						<div class="filter-options" id="econ-impact-options"></div>
 					</div>
 				</div>
+
 				<!--Pie filter-->
 				<div class="filter-group">
-					<button class="filter-button">
-						Pie Cateogy
-					</button>
+					<button class="filter-button">Pie Cateogy</button>
 					<div class="filter-panel open">
 						<select id="pie-metric" class="form-select">
 							<option value="nbs_type">NBS Type</option>
@@ -153,30 +170,38 @@
 							<option value="environmental_impacts">Environmental Impact</option>
 							<option value="economic_impacts">Economic Impact</option>
 						</select>
-
 					</div>
 				</div>
+
 			</div>
 		</aside>
 
 		<main class="results-column">
-			<!-- results -->
+
 			<!-- compare bar -->
 			<div id="compare-bar" class="compare-bar hidden">
 				<span id="compare-count"></span>
 				<button id="compare-button">Compare</button>
 				<button id="clear-compare">Clear</button>
 			</div>
+
 			<!-- comparison panel -->
-			 <div id="comparison-results-panel" class="hidden"></div>
-			 <div id="comparison-radar-container" class="hidden">
+			<div id="comparison-results-panel" class="hidden"></div>
+			<div id="comparison-radar-container" class="hidden">
 				<svg id="radar-chart"></svg>
-			 </div>
+			</div>
 
 			<!-- search bar -->
 			<div class="search-bar" id="search-bar">
-			<input type="text" id="search-input" placeholder="Search project..."/>
+				<input type="text" id="search-input" placeholder="Search project..."/>
 			</div>
+
+			<!-- ===== Recommended projects panel (RS output) ===== -->
+			<div id="rs-results-panel" class="hidden" style="margin-bottom: 12px;">
+				<h1>Recommended Projects</h1>
+				<div id="rs-results-list"></div>
+			</div>
+			<!-- ===== END RS output ===== -->
 
 			<div id="overview-strip">
 				<div id="chart-modal" class="hidden">
@@ -200,8 +225,8 @@
 					<h4>Project Started by Year</h4>
 					<svg id="year-chart"></svg>
 				</div>
-
 			</div>
+
 			<!-- map visualization -->
 			<div id="map-controls">
 				<button id="zoom_in">+</button>
@@ -209,30 +234,34 @@
 				<button id="zoom_reset">Reset</button>
 			</div>
 			<div id="map-container" class="map-container"></div>
+
 			<div id="city-popup" class="hidden">
 				<button id="popup-close">X </button>
 				<div id="popup-content"></div>
 			</div>
+
 			<!--Legend-->
 			<div id="pie-legend" class="pie-legend"></div>
-			 
+
 			<div id="results-panel">
 				<h1>Projects</h1>
 				<div id="results-count"></div>
 				<div id="results-list"></div>
 			</div>
-		</main>
 
+		</main>
 	</div>
 
-
-	<!-- embedding JS libraries -->
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
+	<!-- JS libraries -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+			integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
 
 	<!-- d3 -->
 	<script src="https://d3js.org/d3.v7.min.js"></script>
 	<script src="https://d3js.org/topojson.v3.min.js"></script>
 
+	<!-- SortableJS (required for drag/drop) -->
+	<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 
 	<!-- own js files -->
 	<script src="./assets/js/state.js"></script>
@@ -240,5 +269,9 @@
 	<script src="./assets/js/charts.js"></script>
 	<script src="./assets/js/mapVis.js"></script>
 	<script src="./assets/js/main.js"></script>
+
+	<!-- Recommender -->
+	<script src="./assets/js/recommender.js"></script>
+
 	</body>
 </html>
