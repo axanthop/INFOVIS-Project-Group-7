@@ -61,7 +61,6 @@ Promise.all([d3.csv("./assets/data/cleaned.csv"),
         document.getElementById("chart-modal").classList.add("hidden");
     })
 
-
     // trigger the comparison procedure along with the bar containing the buttons compare and clear
     document.getElementById("compare-button").addEventListener("click", () => {
         let comparingProjects = wholeData.filter(d => 
@@ -78,4 +77,18 @@ Promise.all([d3.csv("./assets/data/cleaned.csv"),
         updateCompareBar();
     })
 
+});
+
+document.addEventListener("click", e => {
+    if (!e.target.classList.contains("left-side-header")) return;
+
+    let projectInfoPanel = e.target.nextElementSibling;
+    e.target.classList.toggle("open");
+
+    if(!projectInfoPanel) return;
+    if(projectInfoPanel.style.maxHeight) {
+        projectInfoPanel.style.maxHeight = null;
+    } else {
+        projectInfoPanel.style.maxHeight = projectInfoPanel.scrollHeight + "px";
+    }
 });

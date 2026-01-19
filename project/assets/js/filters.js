@@ -814,27 +814,6 @@ function renderResults(data) {
                                             showProjectInfoView();
                                         })
 
-        // projectCard.innerHTML += `
-        //     <div class="project-hover-panel">
-        //         <p><strong>Country:</strong> ${d.country}</p>
-        //         <p><strong>City:</strong> ${d.city}</p>
-        //         <p><strong>Start Year:</strong> ${d.begin_year}</p>
-        //         <p><strong>End Year:</strong> ${d.end_year}</p>
-        //         <p><strong>NbS Area:</strong> ${d.nbs_area}</p>
-        //         <p><strong>Area before Implementation:</strong> ${d.previous_area_type}</p>
-        //         <p><strong>NbS Type:</strong> ${d.nbs_type}m2</p>
-        //         <p><strong>Total Cost:</strong> ${d.total_cost}€</p>
-        //         <p><strong>Sources of Funding:</strong> ${d.sources_of_funding}</p>
-        //         <p><strong>Environmental Impacts:</strong> ${d.environmental_impacts}</p>
-        //         <p><strong>Economic Impacts:</strong> ${d.economic_impacts}</p>
-        //         <p>
-        //             <strong>Link:</strong>
-        //             <a href="${d.link}" target="_blank" rel="noopener noreferrer">
-        //                 ${d.link}
-        //             </a>
-        //         </p>
-        //     </div>
-        //     `;
 
         let hoverProjectPanel = projectCard.querySelector(".project-hover-panel");
         let hoverTimeout = null;
@@ -919,23 +898,18 @@ function renderComparisonView(projects) {
         <p><strong>City:</strong> ${p.city}</p>
         <p><strong>Start Year:</strong> ${p.begin_year}</p>
         <p><strong>End Year:</strong> ${p.end_year}</p>
-        <p><strong>NbS Area:</strong> ${p.nbs_area}</p>
-        <p><strong>Area before Implementation:</strong> ${p.previous_area_type}</p>
-        <p><strong>NbS Type:</strong> ${p.nbs_type}</p>
-        <p><strong>Total Cost:</strong> ${p.total_cost}</p>
+        <p><strong>NbS Area:</strong> ${p.nbs_area} m2</p>
+        <p><strong>Area before Implementation:</strong> ${renderBulletPointList(p.previous_area_type)}</p>
+        <p><strong>NbS Type:</strong> ${renderBulletPointList(p.nbs_type)}</p>
+        <p><strong>Total Cost:</strong> ${p.total_cost} €</p>
         <p><strong>Sources of Funding:</strong> ${p.sources_of_funding}</p>
-        <p><strong>Environmental Impacts:</strong> ${p.environmental_impacts}</p>
-        <p><strong>Economic Impacts:</strong> ${p.economic_impacts}</p>`
+        <p><strong>Environmental Impacts:</strong> ${renderBulletPointList(p.environmental_impacts)}</p>
+        <p><strong>Economic Impacts:</strong> ${renderBulletPointList(p.economic_impacts)}</p>`
         ;
 
         comparisonGrid.appendChild(column);
     });
 
-    // document.getElementById("back-to-results").addEventListener("click", () => {
-    //     renderResults(filteredData || wholeData);
-    //     updateCompareBar();
-    //     showResultsView();
-    // });
 }
 
 function renderProjectInfo(project) {
@@ -949,29 +923,63 @@ function renderProjectInfo(project) {
 
         <h2>${project.intervention_name || "Unnamed Project"}<h2>
 
-        <div class="project-info-grid">
-            <p><strong>Country:</strong> ${project.country}</p>
-            <p><strong>City:</strong> ${project.city}</p>
-            <p><strong>Start Year:</strong> ${project.begin_year}</p>
-            <p><strong>End Year:</strong> ${project.end_year}</p>
-            <p><strong>NbS Area:</strong> ${project.nbs_area}m2</p>
-            <p><strong>Area before Implementation:</strong> ${project.previous_area_type}</p>
-            <p><strong>NbS Type:</strong> ${project.nbs_type}</p>
-            <p><strong>Total Cost:</strong> ${project.total_cost}€</p>
-            <p><strong>Sources of Funding:</strong> ${project.sources_of_funding}</p>
-            <p><strong>Environmental Impacts:</strong> ${project.environmental_impacts}</p>
-            <p><strong>Economic Impacts:</strong> ${project.economic_impacts}</p>
-            <p>
-                <strong>Link:</strong>
-                <a href="${project.link}" target="_blank" rel="noopener noreferrer">
-                    ${project.link}
-                </a>
-            </p>
+        <div id="project-info-view" class="project-info-page-layout">
+            <section class="project-info-left-part">
+                ${renderPageLayoutLeftSideList("Area before Implementation", project.previous_area_type)}
+                ${renderPageLayoutLeftSideList("NbS Type", project.nbs_type)}
+                ${renderPageLayoutLeftSideList("Environmental Impacts", project.environmental_impacts)}
+                ${renderPageLayoutLeftSideList("Economic Impacts", project.economic_impacts)}
+            </section>
+
+            <aside class="project-info-side">
+                <div class="project-info-card">
+                    <div><strong>Country</strong><span> ${project.country || "-"}</span></div>
+                    <div><strong>City</strong><span> ${project.city || "-"}</span></div>
+                    <div><strong>Start Year</strong><span> ${project.begin_year || "-"}</span></div>
+                    <div><strong>End Year</strong><span> ${project.end_year || "-"}</span></div>
+                    <div><strong>NbS Area</strong><span> ${project.nbs_area || "-"} m2</span></div>
+                    <div><strong>Total Cost</strong><span> ${project.total_cost || "-"} €</span></div>
+                </div>
+            </aside>
+
         </div>`;
 
     document.getElementById("back-to-results").addEventListener("click", () => {
         showResultsView();
     });
+}
+
+function renderPageLayoutLeftSide(title, value) {
+    if (!value || value === "Unknown") return "";
+    return `
+        <button class="left-side-header">${title}</button>
+        <div class="left-side-panel">
+            <p>${value}</p>
+        </div>`;
+}
+
+function renderPageLayoutLeftSideList(title, values) {
+    if (!values || values === "Unknown") return "";
+
+    let listItems = values.split(/[,;-]/).map(v => `<li>${v.trim()}</li>`).join("");
+
+    return `
+        <button class="left-side-header">${title}</button>
+        <div class="left-side-panel">
+            <ul>${listItems}</ul>
+        </div>`;
+}
+
+function renderBulletPointList(value) {
+    if (!value || value === "Unknown") return "<em>-</em>"
+
+    let bulletItems = value.split(/[,;-]/).map(v => v.trim()).filter(v => v.length > 0);
+    if (bulletItems.length === 0) return "<em>-</em>"
+
+    return `
+        <ul style="margin: 0 0 4px 18px;">
+            ${bulletItems.map(i => `<li>${i}</li>`).join("")}
+        </ul>`;
 }
 
 function showComparisonView() {
@@ -985,11 +993,14 @@ function showComparisonView() {
     document.getElementById("pie-legend").classList.add("hidden");
     document.getElementById("map-container").classList.add("hidden");
     document.getElementById("map-controls").classList.add("hidden");
+
+    updateOverviewVisible();
 }
 
 function showProjectInfoView() {
     currentView = "project-info";
     
+    document.body.classList.add("project-info-view");
     document.getElementById("results-panel").classList.add("hidden");
     document.getElementById("overview-strip").classList.add("hidden");
     document.getElementById("search-bar").classList.add("hidden");
@@ -999,11 +1010,14 @@ function showProjectInfoView() {
     document.getElementById("map-container").classList.add("hidden");
     document.getElementById("map-controls").classList.add("hidden");
     document.getElementById("project-info-panel").classList.remove("hidden");
+
+    renderProjectInfo(project);
 }
 
 function showResultsView() {
     currentView = "results";
 
+    document.body.classList.remove("project-info-view");
     document.getElementById("project-info-panel").classList.add("hidden");
     document.getElementById("comparison-results-panel").classList.add("hidden");
     document.getElementById("comparison-radar-container").classList.add("hidden");
@@ -1012,4 +1026,10 @@ function showResultsView() {
     document.getElementById("pie-legend").classList.remove("hidden");
     document.getElementById("map-container").classList.remove("hidden");
     document.getElementById("map-controls").classList.remove("hidden");
+
+    renderCountryBarChartMiniVersion(filteredData || wholeData);
+    renderCostHistogramMiniVersion(filteredData || wholeData);
+    renderTimeLineMiniVersion(filteredData || wholeData);
+    // renderResults(filteredData || wholeData);
+
 }

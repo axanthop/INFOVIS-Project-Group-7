@@ -268,6 +268,20 @@ header{
     padding: 12px;
     border-radius: 8px;
     background: #fff;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.comparison-column ul {
+    padding-left: 18px;
+    margin: 6px 0;
+}
+
+.comparison-column li {
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.4;
 }
 
 /* Radar / overview styles (from your branch) */
@@ -307,12 +321,6 @@ header{
 .radar-legend rect {
     rx: 2;
     ry: 2;
-}
-
-.project-info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 12px;
 }
 
 .overview-chart svg {
@@ -465,4 +473,86 @@ header{
 
 #rs-results-list .rs-card:hover {
   box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+}
+
+.project-title {
+    margin-bottom: 16px;
+}
+
+.project-info-page-layout {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    gap: 20px;
+    padding: 16px;
+    align-items: start;
+}
+
+.project-info-side {
+    position: sticky;
+    top: 80px;
+}
+
+.project-info-card {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 14px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.project-info-card div {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 14px;
+}
+
+body.project-info-view .filters-column {
+    display: none;
+}
+
+body.project-info-view .page-layout {
+    grid-template-columns: 1fr;
+}
+
+.left-side-header {
+    width: 100%;
+    text-align: left;
+    background: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    /* transition: background 0.2s ease; */
+}
+
+.left-side-header:hover {
+    background: #eef4ff;
+}
+
+.left-side-header.open {
+    background: #e0ecff;
+}
+
+.left-side-panel {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    padding: 0 14px;
+    margin-bottom: 12px;
+}
+
+.left-side-panel ul {
+    padding-left: 18px;
+}
+
+.left-side-panel p {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.left-side-panel li {
+    font-size: 14px;
+    line-height: 1.5;
 }
