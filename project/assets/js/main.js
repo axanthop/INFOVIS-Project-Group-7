@@ -1,4 +1,5 @@
 let mapVisInstance;
+window.selectedMetrics="nbs_type";
 
 Promise.all([d3.csv("./assets/data/cleaned.csv"), 
              d3.csv("./assets/data/coordinates.csv"),

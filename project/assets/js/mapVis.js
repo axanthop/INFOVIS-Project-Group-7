@@ -255,9 +255,24 @@ class MapVis{
             ${d.projects.map(p => `<li>
                 ${p.intervention_name || "Unnamed Project"}
                 <button>more info</button>
-                <button>compare</button>
+                <button class="popup-compare-btn" data-project="${p.intervention_name}">compare</button>
                 </li>`).join("")}
             </ul>`);
+        
+        d3.select("#popup-content")
+                .selectAll(".popup-compare-btn")
+                .on("click", (event)=>{
+                    const projectId = event.currentTarget.dataset.project;
+
+                    if(comparingSet.has(projectId)){
+                        comparingSet.delete(projectId);
+                    }
+                    else{
+                        comparingSet.add(projectId);
+                    }
+                    updateCompareBar();
+                    event.stopPropagation();
+                });
     }
 
     // hidePop(){
