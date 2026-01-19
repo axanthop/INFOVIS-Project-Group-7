@@ -1,1 +1,1 @@
-# INFOVIS-Project-Group-8
+# INFOVIS-Project-Group-7
