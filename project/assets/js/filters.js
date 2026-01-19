@@ -213,23 +213,25 @@ function applyFilters() {
     // active filters
     renderActiveFilters();
 
-    // bar chart mini
-    renderCountryBarChartMiniVersion(filteredData);
+    if (currentView === "results") {
+        // bar chart mini
+        renderCountryBarChartMiniVersion(filteredData);
 
-    // bar chart
-    renderCountryBarChart(filteredData);
+        // bar chart
+        renderCountryBarChart(filteredData);
 
-    // histogram mini
-    renderCostHistogramMiniVersion(filteredData);
+        // histogram mini
+        renderCostHistogramMiniVersion(filteredData);
 
-    // histogram
-    renderCostHistogram(filteredData);
+        // histogram
+        renderCostHistogram(filteredData);
 
-    // timeline mini
-    renderTimeLineMiniVersion(filteredData);
+        // timeline mini
+        renderTimeLineMiniVersion(filteredData);
 
-    // timeline
-    renderTimeLine(filteredData);
+        // timeline
+        renderTimeLine(filteredData);
+    }
 
     // console.log("Filtered Projects: ", filteredData);
     renderResults(filteredData);
@@ -804,22 +806,35 @@ function renderResults(data) {
                 </label>
             </div>
             `;
+        
+        projectCard.querySelector(".project-card-header")
+                                        .addEventListener("click", () => {
+                                            selectedProject = d;
+                                            renderProjectInfo(d);
+                                            showProjectInfoView();
+                                        })
 
-        projectCard.innerHTML += `
-            <div class="project-hover-panel">
-                <p><strong>Country:</strong> ${d.country}</p>
-                <p><strong>City:</strong> ${d.city}</p>
-                <p><strong>Start Year:</strong> ${d.begin_year}</p>
-                <p><strong>End Year:</strong> ${d.end_year}</p>
-                <p><strong>NbS Area:</strong> ${d.nbs_area}</p>
-                <p><strong>Area before Implementation:</strong> ${d.previous_area_type}</p>
-                <p><strong>NbS Type:</strong> ${d.nbs_type}m2</p>
-                <p><strong>Total Cost:</strong> ${d.total_cost}€</p>
-                <p><strong>Sources of Funding:</strong> ${d.sources_of_funding}</p>
-                <p><strong>Environmental Impacts:</strong> ${d.environmental_impacts}</p>
-                <p><strong>Economic Impacts:</strong> ${d.economic_impacts}</p>
-            </div>
-            `;
+        // projectCard.innerHTML += `
+        //     <div class="project-hover-panel">
+        //         <p><strong>Country:</strong> ${d.country}</p>
+        //         <p><strong>City:</strong> ${d.city}</p>
+        //         <p><strong>Start Year:</strong> ${d.begin_year}</p>
+        //         <p><strong>End Year:</strong> ${d.end_year}</p>
+        //         <p><strong>NbS Area:</strong> ${d.nbs_area}</p>
+        //         <p><strong>Area before Implementation:</strong> ${d.previous_area_type}</p>
+        //         <p><strong>NbS Type:</strong> ${d.nbs_type}m2</p>
+        //         <p><strong>Total Cost:</strong> ${d.total_cost}€</p>
+        //         <p><strong>Sources of Funding:</strong> ${d.sources_of_funding}</p>
+        //         <p><strong>Environmental Impacts:</strong> ${d.environmental_impacts}</p>
+        //         <p><strong>Economic Impacts:</strong> ${d.economic_impacts}</p>
+        //         <p>
+        //             <strong>Link:</strong>
+        //             <a href="${d.link}" target="_blank" rel="noopener noreferrer">
+        //                 ${d.link}
+        //             </a>
+        //         </p>
+        //     </div>
+        //     `;
 
         let hoverProjectPanel = projectCard.querySelector(".project-hover-panel");
         let hoverTimeout = null;
@@ -890,7 +905,7 @@ function renderComparisonView(projects) {
     comparisonResultsPanel.innerHTML = `
     <h2>Project Comparison</h2>
     <div class="comparison-grid"></div>`;
-    // <button id="back-to-results"><- Back to results</button> 
+    // <button id="back-to-results"> Back to results</button> 
 
     let comparisonGrid = comparisonResultsPanel.querySelector(".comparison-grid");
 
@@ -923,17 +938,78 @@ function renderComparisonView(projects) {
     // });
 }
 
+function renderProjectInfo(project) {
+    let moreInfoPanel = document.getElementById("project-info-panel");
+
+    moreInfoPanel.innerHTML = `
+
+        <button id="back-to-results" class="btn btn-sm-secondary mb-3">
+            Back to All Projects
+        </button>
+
+        <h2>${project.intervention_name || "Unnamed Project"}<h2>
+
+        <div class="project-info-grid">
+            <p><strong>Country:</strong> ${project.country}</p>
+            <p><strong>City:</strong> ${project.city}</p>
+            <p><strong>Start Year:</strong> ${project.begin_year}</p>
+            <p><strong>End Year:</strong> ${project.end_year}</p>
+            <p><strong>NbS Area:</strong> ${project.nbs_area}m2</p>
+            <p><strong>Area before Implementation:</strong> ${project.previous_area_type}</p>
+            <p><strong>NbS Type:</strong> ${project.nbs_type}</p>
+            <p><strong>Total Cost:</strong> ${project.total_cost}€</p>
+            <p><strong>Sources of Funding:</strong> ${project.sources_of_funding}</p>
+            <p><strong>Environmental Impacts:</strong> ${project.environmental_impacts}</p>
+            <p><strong>Economic Impacts:</strong> ${project.economic_impacts}</p>
+            <p>
+                <strong>Link:</strong>
+                <a href="${project.link}" target="_blank" rel="noopener noreferrer">
+                    ${project.link}
+                </a>
+            </p>
+        </div>`;
+
+    document.getElementById("back-to-results").addEventListener("click", () => {
+        showResultsView();
+    });
+}
+
 function showComparisonView() {
+    currentView = "comparison";
+
     document.getElementById("results-panel").classList.add("hidden");
     document.getElementById("comparison-results-panel").classList.remove("hidden");
     document.getElementById("comparison-radar-container").classList.remove("hidden");
     document.getElementById("search-bar").classList.add("hidden");
     document.getElementById("overview-strip").classList.add("hidden");
+    document.getElementById("pie-legend").classList.add("hidden");
+    document.getElementById("map-container").classList.add("hidden");
+    document.getElementById("map-controls").classList.add("hidden");
+}
+
+function showProjectInfoView() {
+    currentView = "project-info";
+    
+    document.getElementById("results-panel").classList.add("hidden");
+    document.getElementById("overview-strip").classList.add("hidden");
+    document.getElementById("search-bar").classList.add("hidden");
+    document.getElementById("comparison-results-panel").classList.add("hidden");
+    document.getElementById("comparison-radar-container").classList.add("hidden");
+    document.getElementById("pie-legend").classList.add("hidden");
+    document.getElementById("map-container").classList.add("hidden");
+    document.getElementById("map-controls").classList.add("hidden");
+    document.getElementById("project-info-panel").classList.remove("hidden");
 }
 
 function showResultsView() {
+    currentView = "results";
+
+    document.getElementById("project-info-panel").classList.add("hidden");
     document.getElementById("comparison-results-panel").classList.add("hidden");
     document.getElementById("comparison-radar-container").classList.add("hidden");
     document.getElementById("results-panel").classList.remove("hidden");
     document.getElementById("overview-strip").classList.remove("hidden");
+    document.getElementById("pie-legend").classList.remove("hidden");
+    document.getElementById("map-container").classList.remove("hidden");
+    document.getElementById("map-controls").classList.remove("hidden");
 }

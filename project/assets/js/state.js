@@ -23,3 +23,9 @@ window.wholeData = [];
 window.filteredData = [];
 // for the radar chart
 window.radarMaxValues = null;
+
+// for the more-info view
+window.selectedProject = null;
+
+// to track the current view in the page
+window.currentView = "results";

@@ -182,7 +182,7 @@
 			<div id="compare-bar" class="compare-bar hidden">
 				<span id="compare-count"></span>
 				<button id="compare-button">Compare</button>
-				<button id="clear-compare">Clear</button>
+				<!-- <button id="clear-compare">Clear</button> -->
 			</div>
 
 			<!-- comparison panel -->
@@ -191,17 +191,36 @@
 				<svg id="radar-chart"></svg>
 			</div>
 
-			<!-- search bar -->
-			<div class="search-bar" id="search-bar">
-				<input type="text" id="search-input" placeholder="Search project..."/>
-			</div>
+			<!-- more-info panel -->
+			 <div id="project-info-panel" class="hidden"></div>
 
-			<!-- ===== Recommended projects panel (RS output) ===== -->
+			<!-- Recommended projects panel (RS output) -->
 			<div id="rs-results-panel" class="hidden" style="margin-bottom: 12px;">
 				<h1>Recommended Projects</h1>
 				<div id="rs-results-list"></div>
 			</div>
-			<!-- ===== END RS output ===== -->
+			<!-- END RS output -->
+
+			<!-- map visualization -->
+			<div id="map-controls">
+				<button id="zoom_in">+</button>
+				<button id="zoom_out">-</button>
+				<button id="zoom_reset">Reset</button>
+			</div>
+			<div id="map-container" class="map-container"></div>
+
+			<div id="city-popup" class="hidden">
+				<button id="popup-close">X </button>
+				<div id="popup-content"></div>
+			</div>
+
+			<!--Legend-->
+			<div id="pie-legend" class="pie-legend"></div>
+
+			<!-- search bar -->
+			<div class="search-bar" id="search-bar">
+				<input type="text" id="search-input" placeholder="Search project..."/>
+			</div>
 
 			<div id="overview-strip">
 				<div id="chart-modal" class="hidden">
@@ -227,22 +246,7 @@
 				</div>
 			</div>
 
-			<!-- map visualization -->
-			<div id="map-controls">
-				<button id="zoom_in">+</button>
-				<button id="zoom_out">-</button>
-				<button id="zoom_reset">Reset</button>
-			</div>
-			<div id="map-container" class="map-container"></div>
-
-			<div id="city-popup" class="hidden">
-				<button id="popup-close">X </button>
-				<div id="popup-content"></div>
-			</div>
-
-			<!--Legend-->
-			<div id="pie-legend" class="pie-legend"></div>
-
+			<!-- results panel -->
 			<div id="results-panel">
 				<h1>Projects</h1>
 				<div id="results-count"></div>

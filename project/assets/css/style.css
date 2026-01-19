@@ -154,6 +154,16 @@ header{
     font-size: 16px;
 }
 
+.project-card-header {
+    cursor: pointer;
+    transition: color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.project-card-header:hover {
+    color: #1f77b4;
+    background-color: rgba(31, 119, 180, 0.08);
+}
+
 .project-hover-panel {
     position: absolute;
     top: 0;
@@ -297,6 +307,12 @@ header{
 .radar-legend rect {
     rx: 2;
     ry: 2;
+}
+
+.project-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
 }
 
 .overview-chart svg {
