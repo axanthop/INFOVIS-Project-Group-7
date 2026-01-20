@@ -13,7 +13,8 @@ class MapVis{
         vis.width = document.getElementById(vis.parentElement).clientWidth- vis.margin.left-vis.margin.right;
         vis.height = 450 - vis.margin.top-vis.margin.bottom;
         vis.pieradius = 10;
-        
+        vis.colorScale = d3.scaleOrdinal(d3.schemeTableau10);
+
         vis.svg = d3.select("#"+vis.parentElement).append("svg")
             .attr("width", vis.width+vis.margin.left+vis.margin.right)
             .attr("height", vis.height+vis.margin.top+vis.margin.bottom)
@@ -96,6 +97,13 @@ class MapVis{
             d => `${d.city}|||${d.country}`
         );
 
+        // const allCategories = Array.from(
+        //     new Set(
+        //         data.map(d=>d[window,selectedMetrics] || "Unknown")
+        //     )
+        // )
+        // vis.colorScale.domain(allCategories);
+
         let citycounts = projectsByCity.map(([key, count])=>{
             let [city, country] = key.split("|||");
 
@@ -126,7 +134,6 @@ class MapVis{
             .value(d=>d.value)
             .sort(null);
 
-        const colorScale = d3.scaleOrdinal(d3.schemeTableau10);
 
         data.forEach(d=>{
             d.projects.forEach(p=>{
@@ -177,18 +184,17 @@ class MapVis{
                 .join(
                     enter => enter.append("path")
                         .attr("d",arc)
-                        .attr("fill", d=>colorScale(d.data.key))
+                        .attr("fill", d=>vis.colorScale(d.data.key))
                         .attr("stroke", "#999")
                         .attr("stroke-width", 0.3)
                     ,
                     update => update
                         .attr("d", arc)
-                        .attr("fill", d=>colorScale(d.data.key)),
+                        .attr("fill", d=>vis.colorScale(d.data.key)),
 
                     exit => exit.remove()
                 );
     });
-    vis.updateLegend(categories, colorScale);
 }
 
     updateLegend(categories, colorScale){
@@ -211,53 +217,49 @@ class MapVis{
             .text(d=>d);
 
     }
-
-
-    Circles(data) {
-        let vis = this;
-
-        let radiusScale = d3.scaleSqrt()
-            .domain([1, d3.max(data, d=> d.count)])
-            .range([1,4]);
-        
-        let circles = vis.circlesGroup.selectAll(".city-circle")
-            .data(data, d=> d.city +d.country);
-        
-        circles.exit().remove();
-
-        circles 
-            .attr("cx", d=> vis.projection([d.longitude, d.latitude])[0])
-            .attr("cy", d=> vis.projection([d.longitude, d.latitude])[1])
-            .attr("r", d=> radiusScale(d.count)/vis.currentZoom);
-        
-        circles.enter()
-            .append("circle")
-            .attr("class", "city-circle")
-            .attr("cx", d=> vis.projection([d.longitude, d.latitude])[0])
-            .attr("cy", d=> vis.projection([d.longitude, d.latitude])[1])
-            .attr("r",0)
-            .on("click", (event, d)=> vis.showPop(event, d))
-            .transition()
-            .attr("r", d=> radiusScale(d.count)/vis.currentZoom);
-        }
     
     showPop(event, d){
+        let vis= this;
         let popup = d3.select("#city-popup");
 
         popup.classed("hidden", false)
             .style("left", (event.pageX+10)+"px")
             .style("top", (event.pageY+10)+"px");
 
+        const pieData =d3.rollups(
+            d.projects,
+            v=>v.length,
+            p=>p[window.selectedMetrics] || "Unknown"
+        ).map(([key, value])=>({key, value}));
+
+        
+        //build legend
+        const legendHTML=`
+        <div class="popup-legend">
+            <h5>Legend (${window.selectedMetrics.replaceAll("_", " ")})</h5>
+            ${pieData.map(d=>`
+                <div class="popup-legend-item">
+                    <span class="popup-legend-color" style="background:${vis.colorScale(d.key)}"></span>
+                    <span class="popup-legend-label">${d.key} (${d.value})</span>
+                </div>
+                `).join("")}
+        </div>
+        `;  
         d3.select("#popup-content").html(`
             <h4>${d.city}, ${d.country}</h4>
             <p>Number of Projects: ${d.count}</p>
+
+            
+
             <ul>
             ${d.projects.map(p => `<li>
                 ${p.intervention_name || "Unnamed Project"}
                 <button class="popup-more-info-btn" data-project="${p.intervention_name}">more info</button>
                 <button class="popup-compare-btn" data-project="${p.intervention_name}">compare</button>
                 </li>`).join("")}
-            </ul>`);
+            </ul>
+            ${legendHTML}
+            `);
 
         d3.select("#popup-content")
                     .selectAll(".popup-more-info-btn")

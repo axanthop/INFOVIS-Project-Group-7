@@ -556,3 +556,21 @@ body.project-info-view .page-layout {
     font-size: 14px;
     line-height: 1.5;
 }
+.popup-legend{
+    margin: 10px 0;
+}
+.popup-legend-item{
+    display: flex;
+    align-items: center;
+    gap:8px;
+    margin-bottom: 5px;
+}
+.popup-legend-color{
+    display: inline-block;
+    width: 12px;
+    height:12px;
+}
+.popup-legend-label{
+    white-space:nowrap;
+    line-height: 1.2;
+}
