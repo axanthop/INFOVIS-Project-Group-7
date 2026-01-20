@@ -254,10 +254,26 @@ class MapVis{
             <ul>
             ${d.projects.map(p => `<li>
                 ${p.intervention_name || "Unnamed Project"}
-                <button>more info</button>
+                <button class="popup-more-info-btn" data-project="${p.intervention_name}">more info</button>
                 <button class="popup-compare-btn" data-project="${p.intervention_name}">compare</button>
                 </li>`).join("")}
             </ul>`);
+
+        d3.select("#popup-content")
+                    .selectAll(".popup-more-info-btn")
+                    .on("click", (event) => {
+                        let projectName = event.currentTarget.dataset.project;
+                        let proj = wholeData.find(d => d.intervention_name === projectName);
+
+                        if (!proj) return;
+
+                        d3.select("#city-popup").classed("hidden", true);
+
+                        renderProjectInfo(proj);
+                        showProjectInfoView();
+
+                        event.stopPropagation();
+                    })
         
         d3.select("#popup-content")
                 .selectAll(".popup-compare-btn")
