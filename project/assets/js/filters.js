@@ -1006,7 +1006,7 @@ function showProjectInfoView() {
     document.getElementById("search-bar").classList.add("hidden");
     document.getElementById("comparison-results-panel").classList.add("hidden");
     document.getElementById("comparison-radar-container").classList.add("hidden");
-    document.getElementById("pie-legend").classList.add("hidden");
+    // document.getElementById("pie-legend").classList.add("hidden");
     document.getElementById("map-container").classList.add("hidden");
     document.getElementById("map-controls").classList.add("hidden");
     document.getElementById("project-info-panel").classList.remove("hidden");

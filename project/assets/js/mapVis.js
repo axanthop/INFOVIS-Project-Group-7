@@ -13,7 +13,6 @@ class MapVis{
         vis.width = document.getElementById(vis.parentElement).clientWidth- vis.margin.left-vis.margin.right;
         vis.height = 450 - vis.margin.top-vis.margin.bottom;
         vis.pieradius = 10;
-        vis.colorScale = d3.scaleOrdinal(d3.schemeTableau10);
 
         vis.svg = d3.select("#"+vis.parentElement).append("svg")
             .attr("width", vis.width+vis.margin.left+vis.margin.right)
@@ -97,13 +96,6 @@ class MapVis{
             d => `${d.city}|||${d.country}`
         );
 
-        // const allCategories = Array.from(
-        //     new Set(
-        //         data.map(d=>d[window,selectedMetrics] || "Unknown")
-        //     )
-        // )
-        // vis.colorScale.domain(allCategories);
-
         let citycounts = projectsByCity.map(([key, count])=>{
             let [city, country] = key.split("|||");
 
@@ -134,13 +126,14 @@ class MapVis{
             .value(d=>d.value)
             .sort(null);
 
-
+        const colorScale =d3.scaleOrdinal(d3.schemeTableau10);
+        
         data.forEach(d=>{
             d.projects.forEach(p=>{
                 allcat.add(p[window.selectedMetrics] || "Unknown");
             });
         })
-
+        
         const categories = Array.from(allcat);
 
         let glyphs= vis.glyphGroup
@@ -184,13 +177,13 @@ class MapVis{
                 .join(
                     enter => enter.append("path")
                         .attr("d",arc)
-                        .attr("fill", d=>vis.colorScale(d.data.key))
+                        .attr("fill", d=>colorScale(d.data.key))
                         .attr("stroke", "#999")
                         .attr("stroke-width", 0.3)
                     ,
                     update => update
                         .attr("d", arc)
-                        .attr("fill", d=>vis.colorScale(d.data.key)),
+                        .attr("fill", d=>colorScale(d.data.key)),
 
                     exit => exit.remove()
                 );
@@ -219,38 +212,15 @@ class MapVis{
     }
     
     showPop(event, d){
-        let vis= this;
         let popup = d3.select("#city-popup");
 
         popup.classed("hidden", false)
             .style("left", (event.pageX+10)+"px")
             .style("top", (event.pageY+10)+"px");
 
-        const pieData =d3.rollups(
-            d.projects,
-            v=>v.length,
-            p=>p[window.selectedMetrics] || "Unknown"
-        ).map(([key, value])=>({key, value}));
-
-        
-        //build legend
-        const legendHTML=`
-        <div class="popup-legend">
-            <h5>Legend (${window.selectedMetrics.replaceAll("_", " ")})</h5>
-            ${pieData.map(d=>`
-                <div class="popup-legend-item">
-                    <span class="popup-legend-color" style="background:${vis.colorScale(d.key)}"></span>
-                    <span class="popup-legend-label">${d.key} (${d.value})</span>
-                </div>
-                `).join("")}
-        </div>
-        `;  
         d3.select("#popup-content").html(`
             <h4>${d.city}, ${d.country}</h4>
             <p>Number of Projects: ${d.count}</p>
-
-            
-
             <ul>
             ${d.projects.map(p => `<li>
                 ${p.intervention_name || "Unnamed Project"}
@@ -258,7 +228,6 @@ class MapVis{
                 <button class="popup-compare-btn" data-project="${p.intervention_name}">compare</button>
                 </li>`).join("")}
             </ul>
-            ${legendHTML}
             `);
 
         d3.select("#popup-content")
