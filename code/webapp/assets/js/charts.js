@@ -276,6 +276,13 @@ function renderCountryBarChart(data, svgSelector = "#country-bar-chart") {
                     moveCountryFromChart(d.country);
                 });
 
+    g.append("text")
+            .attr("x", -height/2)
+            .attr("y", -45)
+            .attr("transform", "rotate(-90)")
+            .attr("font-size", "9px")
+            .text("Number of Projects");
+
 }
 
 function moveCountryFromChart(country) {
@@ -408,6 +415,13 @@ function renderCostHistogram(data, svgSelector = "#chart-modal-svg") {
                 .attr("width", d => Math.max(0, x(d.x1) - x(d.x0) - 1))
                 .attr("height", d => height - y(d.length))
                 .attr("fill", "#69b3a2");
+
+    g.append("text")
+            .attr("x", -height/2)
+            .attr("y", -45)
+            .attr("transform", "rotate(-90)")
+            .attr("font-size", "9px")
+            .text("Number of Projects");
 }
 
 
