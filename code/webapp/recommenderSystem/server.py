@@ -10,12 +10,13 @@ from fastapi.staticfiles import StaticFiles
 
 from .model import SimpleNBSRecommender, _split_multivalue
 
-# ====== PATHS (updated for new structure) ======
-BASE_DIR = Path(__file__).resolve().parents[1]  # repo root
-# WEBAPP_DIR = BASE_DIR / "webapp"
-ASSETS_DIR = "assets"
-DATA_PATH = ASSETS_DIR / "data" / "cleaned.csv"
-# ==============================================
+# ====== PATHS (fixed for your current structure) ======
+from pathlib import Path
+WEBAPP_DIR = Path(__file__).resolve().parents[1]
+ASSETS_DIR = WEBAPP_DIR / "assets"
+DATA_PATH  = ASSETS_DIR / "data" / "cleaned.csv"
+# ======================================================
+
 
 app = FastAPI(title="NBS Recommender API")
 
