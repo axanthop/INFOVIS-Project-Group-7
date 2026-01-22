@@ -21,20 +21,17 @@ This project is about the creation of a web-based Interface aiming to create vis
       Data understanding which are Power BI files that have initial database visualizations
       
 
-## To run the recommendation system:
-Since the recommendation system is build in python, to run it a backend api had to being built. To run the website with the recommendation system the following commands should be followed:
-    
-Install: 
-    `pip install fastapi uvicorn pandas numpy python-multipart`  
-    
-Navigate to the folder that the project is saved 
-    
-Run: 
-    `python -m uvicorn recommenderSystem.server:app --reload`  
+## To run the recommendation system
+Install:
+`pip install fastapi uvicorn pandas numpy python-multipart`
 
-Open: 
-    `http://127.0.0.1:8000/` (API docs: `http://127.0.0.1:8000/docs`)
-(otherwise running index.html contains all project without recommendation system) 
+Run (from the backend folder):
+`cd code/webapp`
+`python -m uvicorn recommenderSystem.server:app --reload`
+
+Open:
+`http://127.0.0.1:8000/` (API docs: `http://127.0.0.1:8000/docs`)
+
 
 ## Website interaction
 The following steps/bullets explain possible interaction a user can have with the webapp 
