@@ -884,10 +884,13 @@ function renderComparisonView(projects) {
     let comparisonResultsPanel = document.getElementById("comparison-results-panel");
 
     comparisonResultsPanel.innerHTML = `
+    <button id="back-to-results"> Back to results</button>
     <h2>Project Comparison</h2>
-    <div class="comparison-grid"></div>`;
-    // <button id="back-to-results"> Back to results</button> 
+    <div class="comparison-grid"></div>
+     `;
 
+    document.getElementById("back-to-results").addEventListener("click", showResultsView);
+    
     let comparisonGrid = comparisonResultsPanel.querySelector(".comparison-grid");
 
     projects.forEach(p => {
@@ -1029,11 +1032,13 @@ function showResultsView() {
     document.getElementById("project-info-panel").classList.add("hidden");
     document.getElementById("comparison-results-panel").classList.add("hidden");
     document.getElementById("comparison-radar-container").classList.add("hidden");
-    document.getElementById("results-panel").classList.remove("hidden");
-    document.getElementById("overview-strip").classList.remove("hidden");
-    document.getElementById("pie-legend").classList.remove("hidden");
     document.getElementById("map-container").classList.remove("hidden");
     document.getElementById("map-controls").classList.remove("hidden");
+    document.getElementById("results-panel").classList.remove("hidden");
+    document.getElementById("overview-strip").classList.remove("hidden");
+    document.getElementById("search-bar").classList.remove("hidden");
+    // document.getElementById("pie-legend").classList.remove("hidden");
+    
 
     renderCountryBarChartMiniVersion(filteredData || wholeData);
     renderCostHistogramMiniVersion(filteredData || wholeData);
