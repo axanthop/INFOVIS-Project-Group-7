@@ -1,4 +1,5 @@
 class MapVis{
+    //map svg, topjson world data, and city coordinates
     constructor(parentElement, WorldData, cityData){
         this.parentElement = parentElement;
         this.WorldData = WorldData;
@@ -6,6 +7,7 @@ class MapVis{
 
         this.initVis();
     }
+    //SVG initialization, map projection, controllers
     initVis(){
         let vis = this;
         vis.currentZoom = 1;
@@ -14,19 +16,21 @@ class MapVis{
         vis.height = 450 - vis.margin.top-vis.margin.bottom;
         vis.pieradius = 10;
 
+        //svg projection
         vis.svg = d3.select("#"+vis.parentElement).append("svg")
             .attr("width", vis.width+vis.margin.left+vis.margin.right)
             .attr("height", vis.height+vis.margin.top+vis.margin.bottom)
             .append("g")
             .attr("transform",`translate(${vis.margin.left},${vis.margin.top})`);
         
+        //holds for zooming
         vis.contrainer = vis.svg.append("g")
             .attr("transform", `translate(${vis.margin.left},${vis.margin.top})`);
 
         vis.zoomGroup = vis.contrainer.append("g")
             .attr("class", "zoom-group");
 
-
+        //map creation and topojson to geojson
         vis.projection = d3.geoNaturalEarth1()
                         .scale(vis.height/3)
                         .translate([vis.width/2, vis.height/2]);
@@ -35,8 +39,7 @@ class MapVis{
 
         vis.world = topojson.feature(vis.WorldData, vis.WorldData.objects.countries).features;
 
-        vis.arc =d3.arc;
-
+        //draw countries
         vis.zoomGroup.selectAll(".country")
             .data(vis.world)
             .enter()
@@ -46,13 +49,13 @@ class MapVis{
             .attr("fill", "#ccc")
             .attr("stroke","#999");
         
-       // vis.circlesGroup = vis.zoomGroup.append("g").attr("class", "city-circles");
-
+        //for pie glyphs
         vis.glyphGroup = vis.zoomGroup.append("g").attr("class", "city-glyphs");
 
         vis.radiusScale = d3.scaleSqrt()
             .range([1,4]);
         
+        //zoom behavior
         vis.zoom = d3.zoom()
             .scaleExtent([1,10])
             .on("zoom", (event)=>{
@@ -70,12 +73,7 @@ class MapVis{
                 });
             });
 
-        vis.zoomGroup.selectAll(".pie-slice")
-            .attr("d",d=>
-                vis.arc
-                    .innerRadius(0)
-                    .outerRadius(vis.pieradius/vis.currentZoom)(d)
-            );
+        //zoom controls to svg 
         vis.svg.call(vis.zoom);
         d3.select("#zoom_in").on("click",()=>{
             vis.svg.transition()
@@ -95,14 +93,16 @@ class MapVis{
 
         d3.select("#popup-close").on("click", ()=> { d3.select("#city-popup").classed("hidden", true);});   
     }
+    // aggregate projects by city and pieglyph rendering
     updateVis(data){
         let vis = this;
+        // group project by city country
         let projectsByCity = d3.rollups(
             data, 
             v => v, 
             d => `${d.city}|||${d.country}`
         );
-
+        // merge with coordinates
         let citycounts = projectsByCity.map(([key, count])=>{
             let [city, country] = key.split("|||");
 
@@ -120,20 +120,18 @@ class MapVis{
             };
         }).filter(d=> d !== null);
 
-       // vis.Circles(citycounts);
        vis.pieglyph(citycounts);
     }
+    // pieglyph drawing
     pieglyph(data){
         let vis = this;
         let allcat=new Set();
-
-        let pierad= vis.pieradius/vis.currentZoom;
 
         const pie = d3.pie()
             .value(d=>d.value)
             .sort(null);
 
-        
+        // collect categories for same color mapping
         data.forEach(d=>{
             d.projects.forEach(p=>{
                 allcat.add(p[window.selectedMetrics] || "Unknown");
@@ -156,6 +154,7 @@ class MapVis{
         
         glyphs = glyphsEnter.merge(glyphs);
 
+        // gluphs on map
         glyphs.attr("transform",d=>{
             const [x,y] = vis.projection([d.longitude, d.latitude]);
             return `translate(${x},${y})`;
@@ -176,8 +175,6 @@ class MapVis{
             const arc = d3.arc()
                 .innerRadius(0)
                 .outerRadius(radius);
-
-            const arcs= pie(pieData);
                 
             glyph.selectAll("path")
                 .data(pie(pieData),d=>d.data.key)
@@ -198,26 +195,6 @@ class MapVis{
     });
 }
 
-    updateLegend(categories, colorScale){
-        let legend = d3.select("#pie-legend");
-
-        legend.html("");
-
-        let items= legend.selectAll(".legend-item")
-            .data(categories)
-            .enter()
-            .append("div")
-            .attr("class", "legend-item");
-
-        items.append("span")
-            .attr("class", "legend-color")
-            .style("background-color", d=>colorScale(d));
-
-        items.append("span")
-            .attr("class", "legend-label")
-            .text(d=>d);
-
-    }
     
     showPop(event, d){
         let popup = d3.select("#city-popup");
@@ -305,8 +282,4 @@ class MapVis{
 
     }
 
-    // hidePop(){
-    //     // d3.select("#city-popup").classed("hidden", true);
-    //     d3.select("#popup-close").on("click", ()=> { d3.select("#city-popup").classed("hidden", true);});   
-    // }
 }
