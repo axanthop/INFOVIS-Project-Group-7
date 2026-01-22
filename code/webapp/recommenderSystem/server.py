@@ -12,8 +12,8 @@ from .model import SimpleNBSRecommender, _split_multivalue
 
 # ====== PATHS (updated for new structure) ======
 BASE_DIR = Path(__file__).resolve().parents[1]  # repo root
-WEBAPP_DIR = BASE_DIR / "webapp"
-ASSETS_DIR = WEBAPP_DIR / "assets"
+# WEBAPP_DIR = BASE_DIR / "webapp"
+ASSETS_DIR = "assets"
 DATA_PATH = ASSETS_DIR / "data" / "cleaned.csv"
 # ==============================================
 
