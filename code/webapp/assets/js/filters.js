@@ -903,8 +903,10 @@ function renderComparisonView(projects) {
         <p><strong>NbS Area:</strong> ${p.nbs_area} m2</p>
         <p><strong>Area before Implementation:</strong> ${renderBulletPointList(p.previous_area_type)}</p>
         <p><strong>NbS Type:</strong> ${renderBulletPointList(p.nbs_type)}</p>
+        <p><strong>Focus of the Project:</strong> ${renderBulletPointList(p.project_focus)}</p>
         <p><strong>Total Cost:</strong> ${p.total_cost} €</p>
         <p><strong>Sources of Funding:</strong> ${p.sources_of_funding}</p>
+        <p><strong>Key Actors:</strong> ${p.key_actors}</p>
         <p><strong>Environmental Impacts:</strong> ${renderBulletPointList(p.environmental_impacts)}</p>
         <p><strong>Economic Impacts:</strong> ${renderBulletPointList(p.economic_impacts)}</p>`
         ;
@@ -927,8 +929,11 @@ function renderProjectInfo(project) {
 
         <div id="project-info-view" class="project-info-page-layout">
             <section class="project-info-left-part">
+                ${renderPageLayoutLeftSide("Short Description", project.short_description)}
                 ${renderPageLayoutLeftSideList("Area before Implementation", project.previous_area_type)}
                 ${renderPageLayoutLeftSideList("NbS Type", project.nbs_type)}
+                ${renderPageLayoutLeftSideList("Focus of the Project", project.project_focus)}
+                ${renderPageLayoutLeftSideList("Key Actors", project.key_actors)}
                 ${renderPageLayoutLeftSideList("Environmental Impacts", project.environmental_impacts)}
                 ${renderPageLayoutLeftSideList("Economic Impacts", project.economic_impacts)}
             </section>
@@ -941,6 +946,7 @@ function renderProjectInfo(project) {
                     <div><strong>End Year</strong><span> ${project.end_year || "-"}</span></div>
                     <div><strong>NbS Area</strong><span> ${project.nbs_area || "-"} m2</span></div>
                     <div><strong>Total Cost</strong><span> ${project.total_cost || "-"} €</span></div>
+
                 </div>
             </aside>
 
